@@ -1,0 +1,96 @@
+version: 2
+
+models:
+  - name: dim_date
+    columns:
+      - name: date_key
+        data_tests: [unique, not_null]
+
+  - name: dim_plan
+    columns:
+      - name: plan_key
+        data_tests: [unique, not_null]
+      - name: plan_id
+        data_tests: [not_null]
+
+  - name: dim_customer
+    description: One row per customer version. Masked and hashed PII only.
+    columns:
+      - name: customer_key
+        data_tests: [unique, not_null]
+      - name: customer_id
+        data_tests: [not_null]
+      - name: plan_key
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_plan'), field: plan_key}
+      - name: status
+        data_tests:
+          - accepted_values:
+              values: [ACTIVE, SUSPENDED, CHURNED, UNKNOWN]
+
+  - name: fact_usage
+    columns:
+      - name: cdr_id
+        data_tests: [unique, not_null]
+      - name: customer_key
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_customer'), field: customer_key}
+      - name: usage_date_key
+        data_tests:
+          - relationships: {to: ref('dim_date'), field: date_key}
+      - name: event_type
+        data_tests:
+          - accepted_values: {values: [VOICE, SMS, DATA]}
+
+  - name: fact_invoice
+    columns:
+      - name: customer_key
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_customer'), field: customer_key}
+      - name: source
+        data_tests:
+          - accepted_values: {values: [billing_db, billing_file]}
+
+  - name: fact_payment
+    columns:
+      - name: customer_key
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_customer'), field: customer_key}
+      - name: status
+        data_tests:
+          - accepted_values: {values: [PAID, FAILED, REFUNDED]}
+
+  - name: fact_app_events
+    columns:
+      - name: event_id
+        data_tests: [unique, not_null]
+      - name: customer_key
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_customer'), field: customer_key}
+      - name: event_date_key
+        data_tests:
+          - relationships: {to: ref('dim_date'), field: date_key}
+
+  - name: fact_partner_usage
+    columns:
+      - name: partner_record_id
+        data_tests: [unique, not_null]
+      - name: customer_key
+        data_tests:
+          - not_null
+          - relationships: {to: ref('dim_customer'), field: customer_key}
+
+  - name: mart_customer_360
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+
+  - name: mart_revenue_assurance
+    columns:
+      - name: check_id
+        data_tests: [unique, not_null]

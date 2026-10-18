@@ -1,0 +1,148 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Customer Profile: menu open",
+  "name": "cp-menu-open",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "cp-panel",
+      "cp-logo-bg",
+      "cp-logo-icon",
+      "cp-logo-text",
+      "cp-menu-x",
+      "cp-menu-close",
+      "cp-nav-label",
+      "cp-nav-ov-txt",
+      "cp-nav-ov",
+      "cp-nav-dq-txt",
+      "cp-nav-dq",
+      "cp-nav-ra-txt",
+      "cp-nav-ra",
+      "cp-nav-in-txt",
+      "cp-nav-in",
+      "cp-nav-cu-txt",
+      "cp-nav-cu",
+      "cp-nav-nw-txt",
+      "cp-nav-nw",
+      "cp-gold-bg",
+      "cp-gold-text"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "customer-profile",
+    "sections": {
+      "customer-profile": {
+        "visualContainers": {
+          "cp-panel": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cp-logo-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cp-logo-icon": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cp-logo-text": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cp-menu-x": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cp-menu-close": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cp-nav-label": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cp-nav-ov-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cp-nav-ov": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cp-nav-dq-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cp-nav-dq": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cp-nav-ra-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cp-nav-ra": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cp-nav-in-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cp-nav-in": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cp-nav-cu-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cp-nav-cu": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cp-nav-nw-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cp-nav-nw": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cp-gold-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cp-gold-text": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          }
+        }
+      }
+    }
+  }
+}

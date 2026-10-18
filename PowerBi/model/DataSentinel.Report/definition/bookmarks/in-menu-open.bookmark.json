@@ -1,0 +1,154 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Incidents: menu open",
+  "name": "in-menu-open",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "in-panel",
+      "in-logo-bg",
+      "in-logo-icon",
+      "in-logo-text",
+      "in-menu-x",
+      "in-menu-close",
+      "in-nav-label",
+      "in-nav-ov-txt",
+      "in-nav-ov",
+      "in-nav-dq-txt",
+      "in-nav-dq",
+      "in-nav-ra-txt",
+      "in-nav-ra",
+      "in-nav-in-bg",
+      "in-nav-in-txt",
+      "in-nav-in",
+      "in-nav-cu-txt",
+      "in-nav-cu",
+      "in-nav-nw-txt",
+      "in-nav-nw",
+      "in-gold-bg",
+      "in-gold-text"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "incidents",
+    "sections": {
+      "incidents": {
+        "visualContainers": {
+          "in-panel": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-logo-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-logo-icon": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "in-logo-text": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "in-menu-x": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "in-menu-close": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-nav-label": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "in-nav-ov-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "in-nav-ov": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-nav-dq-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "in-nav-dq": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-nav-ra-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "in-nav-ra": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-nav-in-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-nav-in-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "in-nav-in": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-nav-cu-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "in-nav-cu": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-nav-nw-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "in-nav-nw": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-gold-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "in-gold-text": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          }
+        }
+      }
+    }
+  }
+}

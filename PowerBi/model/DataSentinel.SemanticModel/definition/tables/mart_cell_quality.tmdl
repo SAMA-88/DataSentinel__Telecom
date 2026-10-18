@@ -1,0 +1,47 @@
+table mart_cell_quality
+	lineageTag: 8f25a9fa-1257-4b07-8797-e821ead8a848
+
+	column cell_id
+		dataType: string
+		lineageTag: ee739da1-b0d1-487a-a55c-7f595b6708c7
+		summarizeBy: none
+		sourceColumn: cell_id
+
+	column voice_calls
+		dataType: int64
+		lineageTag: 6618849d-861c-40ca-a385-52416955d7f8
+		summarizeBy: sum
+		sourceColumn: voice_calls
+
+	column dropped_calls
+		dataType: int64
+		lineageTag: b4c06cfa-b47e-417f-a9b7-e4720e748404
+		summarizeBy: sum
+		sourceColumn: dropped_calls
+
+	column drop_rate
+		dataType: double
+		formatString: 0.00%
+		lineageTag: dfbd2b5d-3b96-447d-9a90-69d4b235d2d1
+		summarizeBy: average
+		sourceColumn: drop_rate
+
+	column minutes
+		dataType: double
+		lineageTag: 3295a5a9-8922-4df9-81e3-afc89210cc4b
+		summarizeBy: sum
+		sourceColumn: minutes
+
+	partition mart_cell_quality = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_cell_quality", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

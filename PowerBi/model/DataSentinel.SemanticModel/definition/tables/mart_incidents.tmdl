@@ -1,0 +1,142 @@
+table mart_incidents
+	lineageTag: 4e334c41-6e22-4129-8319-7998651a3939
+
+	column incident_id
+		dataType: string
+		lineageTag: 6e2febf9-901c-40fb-9552-8944cba17670
+		summarizeBy: none
+		sourceColumn: incident_id
+
+	column dataset
+		dataType: string
+		lineageTag: 58da8201-4826-439c-a05b-631036f7bce6
+		summarizeBy: none
+		sourceColumn: dataset
+
+	column check_name
+		dataType: string
+		lineageTag: 7fe645d8-f91c-4ed3-a831-4da38083448c
+		summarizeBy: none
+		sourceColumn: check_name
+
+	column pillar
+		dataType: string
+		lineageTag: f5d3b235-b42c-4e9b-9cfa-f8c7b4090539
+		summarizeBy: none
+		sourceColumn: pillar
+
+	column severity
+		dataType: string
+		lineageTag: 371cb229-890d-4f7c-aa31-19e8ab9ffb88
+		summarizeBy: none
+		sourceColumn: severity
+
+	column scope
+		dataType: string
+		lineageTag: c6d14fd6-8769-433c-9729-62479d33ee60
+		summarizeBy: none
+		sourceColumn: scope
+
+	column description
+		dataType: string
+		lineageTag: c071d345-ddf2-474f-8da2-f1efc4638652
+		summarizeBy: none
+		sourceColumn: description
+
+	column impacted
+		dataType: string
+		lineageTag: 64549094-263d-47e4-a195-f708c71e4ab0
+		summarizeBy: none
+		sourceColumn: impacted
+
+	column status
+		dataType: string
+		lineageTag: 359479ef-ff08-4920-8f66-dfcfd62f1dc5
+		summarizeBy: none
+		sourceColumn: status
+
+	column opened_at
+		dataType: dateTime
+		lineageTag: f05e91dd-3617-4a43-8157-05a368fd0e95
+		summarizeBy: none
+		sourceColumn: opened_at
+
+	column closed_at
+		dataType: dateTime
+		lineageTag: bfa698f6-a1b6-4d20-9334-b67a84cc28f0
+		summarizeBy: none
+		sourceColumn: closed_at
+
+	column priority
+		dataType: string
+		lineageTag: b5a30cdd-9b13-4eb8-b76e-6336e78405c3
+		summarizeBy: none
+		sourceColumn: priority
+
+	column team
+		dataType: string
+		lineageTag: 5e807cfc-b92e-4302-9877-36ff532435a6
+		summarizeBy: none
+		sourceColumn: team
+
+	column owner
+		dataType: string
+		lineageTag: ab7f07e6-6346-45a6-81cc-b24f5afd4173
+		summarizeBy: none
+		sourceColumn: owner
+
+	column due_at
+		dataType: dateTime
+		lineageTag: 9b580bf9-5c07-43b0-bf7c-7210bc9597b3
+		summarizeBy: none
+		sourceColumn: due_at
+
+	column acknowledged_at
+		dataType: dateTime
+		lineageTag: b1f42194-434c-4ec0-8f58-04ad48e0cfc9
+		summarizeBy: none
+		sourceColumn: acknowledged_at
+
+	column acknowledged_by
+		dataType: string
+		lineageTag: d7454f0b-ff98-4bbd-9b13-211ba49ce044
+		summarizeBy: none
+		sourceColumn: acknowledged_by
+
+	column escalation_level
+		dataType: int64
+		lineageTag: f078e3bf-680d-479e-acd0-e918dc21e4e9
+		summarizeBy: sum
+		sourceColumn: escalation_level
+
+	column open_hours
+		dataType: double
+		lineageTag: 59cafbce-65e9-438f-975c-40d5e09e48dd
+		summarizeBy: average
+		sourceColumn: open_hours
+
+	column minutes_to_ack
+		dataType: double
+		lineageTag: 8c542238-2fc7-495d-bdc7-401b1b9e922c
+		summarizeBy: average
+		sourceColumn: minutes_to_ack
+
+	column sla_status
+		dataType: string
+		lineageTag: b69f0074-b07d-40a0-932e-d3e5bed340cc
+		summarizeBy: none
+		sourceColumn: sla_status
+
+	partition mart_incidents = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_incidents", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

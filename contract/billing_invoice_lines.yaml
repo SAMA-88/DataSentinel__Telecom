@@ -1,0 +1,27 @@
+dataset: billing_invoice_lines
+version: "1.1"
+owner: Billing team
+description: One row per invoice line change event from Postgres billing.invoice_lines
+glossary: [Invoice line, Plan fee (PLAN_FEE), Data overage (DATA_OVERAGE)]
+source:
+  kind: cdc
+  table: data_sentinel.bronze.cdc_events
+  topic: telecom.billing.invoice_lines
+  key: [line_id]
+columns:
+  - {name: line_id, type: bigint, required: true}
+  - {name: invoice_id, type: bigint, required: true}
+  - {name: line_type, type: string, required: true}
+  - {name: description, type: string}
+  - {name: amount, type: "decimal(10,2)", required: true}
+slo: {min_pass_rate: 0.97, circuit_breaker_min_pass_rate: 0.50}
+rules:
+  - {id: LINE_ID_NOT_NULL, type: not_null, column: line_id, dimension: completeness, severity: critical, action: reject}
+  - {id: LINE_TYPE_DOMAIN, type: domain, column: line_type, values: [PLAN_FEE, DATA_OVERAGE, VOICE, ROAMING], dimension: domain, severity: high, action: reject}
+  - {id: LINE_AMOUNT_NON_NEGATIVE, type: range, column: amount, min: 0, dimension: validity, severity: high, action: flag}
+  - {id: LINE_DESC_PRESENT, type: not_null, column: description, dimension: completeness, severity: low, action: flag}
+monitors:
+  freshness: {type: stream, max_delay_minutes: 1440}
+lineage:
+  upstream: [data_sentinel.bronze.cdc_events]
+  downstream: [data_sentinel.silver.fact_invoice]

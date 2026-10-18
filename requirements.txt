@@ -1,0 +1,7 @@
+dbt-databricks
+databricks-sdk
+confluent-kafka
+faker
+pyyaml
+pytest
+p

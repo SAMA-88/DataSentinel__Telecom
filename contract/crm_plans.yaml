@@ -1,0 +1,28 @@
+dataset: crm_plans
+version: "1.0"
+owner: Product team
+description: One row per plan change event from Postgres crm.plans
+glossary: [Plan, Monthly fee, Data allowance, Voice allowance]
+source:
+  kind: cdc
+  table: data_sentinel.bronze.cdc_events
+  topic: telecom.crm.plans
+  key: [plan_id]
+columns:
+  - {name: plan_id, type: int, required: true}
+  - {name: plan_name, type: string, required: true}
+  - {name: monthly_fee, type: "decimal(8,2)", required: true}
+  - {name: data_gb, type: int}
+  - {name: voice_minutes, type: int}
+slo: {min_pass_rate: 0.99, circuit_breaker_min_pass_rate: 0.50}
+rules:
+  - {id: PLAN_ID_NOT_NULL, type: not_null, column: plan_id, dimension: completeness, severity: critical, action: reject}
+  - {id: PLAN_NAME_PRESENT, type: not_null, column: plan_name, dimension: completeness, severity: medium, action: reject}
+  - {id: PLAN_FEE_POSITIVE, type: range, column: monthly_fee, min: 0.01, dimension: validity, severity: high, action: reject}
+  - {id: PLAN_DATA_RANGE, type: range, column: data_gb, min: 0, dimension: validity, severity: medium, action: reject}
+  - {id: PLAN_VOICE_RANGE, type: range, column: voice_minutes, min: 0, dimension: validity, severity: medium, action: reject}
+monitors:
+  freshness: {type: stream, max_delay_minutes: 1440}
+lineage:
+  upstream: [data_sentinel.bronze.cdc_events]
+  downstream: [data_sentinel.silver.dim_plan]

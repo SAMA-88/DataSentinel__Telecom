@@ -1,0 +1,24 @@
+# Airflow for the Sentinel pipeline (local, single container: fine for the capstone, not for production).
+#   copy .env.example .env      then edit .env
+#   docker compose up -d --build
+#   open http://localhost:8080   (user admin; the password is printed once:  docker compose logs airflow | findstr -i password)
+services:
+  airflow:
+    build: .
+    container_name: sentinel-airflow
+    command: standalone
+    ports:
+      - "8080:8080"
+    env_file: .env
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////opt/airflow/db/airflow.db
+      AIRFLOW_CONN_DATABRICKS_DEFAULT: '{"conn_type":"databricks","host":"https://dbc-21b8c56c-c07d.cloud.databricks.com","password":"${DATABRICKS_TOKEN}"}'
+      DBT_PROFILES_DIR: /opt/airflow/dbt_profiles
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./dbt_profiles:/opt/airflow/dbt_profiles
+      - ../dbt/dbt:/opt/airflow/dbt_simple
+      - airflow_db:/opt/airflow/db
+volumes:
+  airflow_db:

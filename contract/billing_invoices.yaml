@@ -1,0 +1,31 @@
+dataset: billing_invoices
+version: "1.1"
+owner: Billing team
+description: One row per invoice change event from Postgres billing.invoices
+glossary: [Invoice, Billing period, Invoice total]
+source:
+  kind: cdc
+  table: data_sentinel.bronze.cdc_events
+  topic: telecom.billing.invoices
+  key: [invoice_id]
+columns:
+  - {name: invoice_id, type: bigint, required: true}
+  - {name: account_id, type: bigint, required: true}
+  - {name: period_start, type: date_days}
+  - {name: period_end, type: date_days}
+  - {name: total_amount, type: "decimal(10,2)", required: true}
+  - {name: status, type: string}
+  - {name: issued_at, type: timestamp}
+slo: {min_pass_rate: 0.97, circuit_breaker_min_pass_rate: 0.50}
+rules:
+  - {id: INV_ID_NOT_NULL, type: not_null, column: invoice_id, dimension: completeness, severity: critical, action: reject}
+  - {id: INV_TOTAL_NON_NEGATIVE, type: range, column: total_amount, min: 0, dimension: validity, severity: high, action: flag}
+  - {id: INV_TOTAL_OUTLIER, type: range, column: total_amount, max: 1000, dimension: distribution, severity: medium, action: flag, description: Invoice total above 1000 EUR is far outside the normal range}
+  - {id: INV_PERIOD_ORDER, type: compare, left: period_start, op: "<=", right: period_end, dimension: validity, severity: medium, action: reject}
+  - {id: INV_STATUS_DOMAIN, type: domain, column: status, values: [ISSUED, PAID, OVERDUE, CANCELLED], dimension: domain, severity: medium, action: reject}
+  - {id: INV_ISSUED_NOT_FUTURE, type: not_future, column: issued_at, dimension: timeliness, severity: medium, action: reject}
+monitors:
+  freshness: {type: stream, max_delay_minutes: 1440}
+lineage:
+  upstream: [data_sentinel.bronze.cdc_events]
+  downstream: [data_sentinel.silver.fact_invoice]

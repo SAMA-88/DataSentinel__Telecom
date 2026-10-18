@@ -1,0 +1,199 @@
+table mart_customer_360
+	lineageTag: 0c4eb39a-ef55-484c-9450-324366daf1db
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: a30782b4-db04-47f7-a1a4-38bd7116eef6
+		summarizeBy: sum
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column name_masked
+		dataType: string
+		lineageTag: fbc09542-d6c6-4faf-bb9a-cc685edb4fe6
+		summarizeBy: none
+		sourceColumn: name_masked
+
+	column email_masked
+		dataType: string
+		lineageTag: 09287d6a-bcea-41a9-adfe-4deae6b224e3
+		summarizeBy: none
+		sourceColumn: email_masked
+
+	column msisdn_masked
+		dataType: string
+		lineageTag: f2357b67-1ea6-482f-bf42-8b9775d50606
+		summarizeBy: none
+		sourceColumn: msisdn_masked
+
+	column city
+		dataType: string
+		lineageTag: 2b1bbdff-085c-4f87-b61b-944fd9968990
+		summarizeBy: none
+		sourceColumn: city
+
+	column country
+		dataType: string
+		lineageTag: 2c607c68-ddf5-4441-804d-f4ceb735c461
+		summarizeBy: none
+		sourceColumn: country
+
+	column status
+		dataType: string
+		lineageTag: e1c19034-0a57-4ce7-9ee4-0003375b0054
+		summarizeBy: none
+		sourceColumn: status
+
+	column created_at
+		dataType: dateTime
+		lineageTag: 4bd053eb-6b0c-40c6-a05f-609369a054cd
+		summarizeBy: none
+		sourceColumn: created_at
+
+	column plan_name
+		dataType: string
+		lineageTag: a37a9226-31da-42c1-9408-12266a76061f
+		summarizeBy: none
+		sourceColumn: plan_name
+
+	column monthly_fee
+		dataType: double
+		formatString: #,0.00
+		lineageTag: ac9f3722-385f-4b74-8eca-b16bca1995ae
+		summarizeBy: sum
+		sourceColumn: monthly_fee
+
+	column plan_data_gb
+		dataType: int64
+		formatString: 0
+		lineageTag: c2629774-2e2a-483b-96ef-32ac7764924c
+		summarizeBy: sum
+		sourceColumn: plan_data_gb
+
+	column plan_voice_minutes
+		dataType: int64
+		lineageTag: f77059d6-33ae-4604-9f83-674cbfea566e
+		summarizeBy: sum
+		sourceColumn: plan_voice_minutes
+
+	column invoices
+		dataType: int64
+		lineageTag: dede4423-39ea-4310-b355-bc726f2fc01f
+		summarizeBy: sum
+		sourceColumn: invoices
+
+	column billed_eur
+		dataType: double
+		formatString: #,0.00
+		lineageTag: a1ab3e0a-4341-468e-bb64-1b47a46917fb
+		summarizeBy: sum
+		sourceColumn: billed_eur
+
+	column paid_eur
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 84ef7cc8-fac6-490e-8c35-44e9df801e91
+		summarizeBy: sum
+		sourceColumn: paid_eur
+
+	column unpaid_eur
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 781fd879-9599-45c2-aecb-73fc68e74301
+		summarizeBy: sum
+		sourceColumn: unpaid_eur
+
+	column last_payment_at
+		dataType: dateTime
+		lineageTag: 8f154d45-1f14-4b19-98c9-56a758f0e9ed
+		summarizeBy: none
+		sourceColumn: last_payment_at
+
+	column voice_minutes_used
+		dataType: double
+		lineageTag: 8726eb76-63b9-4f5b-b493-26bec2917eab
+		summarizeBy: sum
+		sourceColumn: voice_minutes_used
+
+	column sms_count
+		dataType: int64
+		lineageTag: 4bd693ce-4ccd-413e-aa46-3401f31fcfb6
+		summarizeBy: sum
+		sourceColumn: sms_count
+
+	column data_mb_used
+		dataType: double
+		lineageTag: 2dfea696-6e33-4d03-9009-f8553b66995e
+		summarizeBy: sum
+		sourceColumn: data_mb_used
+
+	column dropped_calls
+		dataType: int64
+		lineageTag: 0b1ac679-467f-4419-ae43-dcc91a95e982
+		summarizeBy: sum
+		sourceColumn: dropped_calls
+
+	column last_network_activity_at
+		dataType: dateTime
+		lineageTag: fccc8d0f-2ab2-4e2d-b493-d547b9ce4c58
+		summarizeBy: none
+		sourceColumn: last_network_activity_at
+
+	column app_events
+		dataType: int64
+		lineageTag: cd671a9b-5d1a-49ef-bd2d-09bcc37ee014
+		summarizeBy: sum
+		sourceColumn: app_events
+
+	column app_crashes
+		dataType: int64
+		lineageTag: c0b30ed7-c2f8-40ad-b2cf-e041bcbfafe3
+		summarizeBy: sum
+		sourceColumn: app_crashes
+
+	column plan_changes
+		dataType: int64
+		lineageTag: fc676875-5ce3-4cdc-9ea8-3ab88a211e09
+		summarizeBy: sum
+		sourceColumn: plan_changes
+
+	column last_login_at
+		dataType: dateTime
+		lineageTag: 8857c69b-aaae-4c86-914c-b563c31f149f
+		summarizeBy: none
+		sourceColumn: last_login_at
+
+	column partner_amount_eur
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 01d93d02-0b9e-4581-8763-8a943e9ed664
+		summarizeBy: sum
+		sourceColumn: partner_amount_eur
+
+	column payment_age_order = VAR d = DATEDIFF ( mart_customer_360[last_payment_at], NOW (), DAY ) RETURN SWITCH ( TRUE (), mart_customer_360[unpaid_eur] <= 0, 0, ISBLANK ( mart_customer_360[last_payment_at] ), 5, d <= 30, 1, d <= 60, 2, d <= 90, 3, 4 )
+		dataType: int64
+		isHidden
+		lineageTag: f5b21c22-f0c5-440a-a04d-3ed5b974ee32
+		summarizeBy: none
+
+	column payment_age_band = SWITCH ( mart_customer_360[payment_age_order], 0, "Paid up", 1, "0-30 days", 2, "31-60 days", 3, "61-90 days", 4, "90+ days", "Never paid" )
+		dataType: string
+		lineageTag: aca62a01-0723-4cbc-8a6e-1bc5f580472a
+		summarizeBy: none
+		sortByColumn: payment_age_order
+
+	partition mart_customer_360 = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_customer_360", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

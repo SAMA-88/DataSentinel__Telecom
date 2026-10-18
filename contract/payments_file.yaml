@@ -1,0 +1,33 @@
+dataset: payments_file
+version: "1.1"
+owner: Finance team
+description: Monthly billing payment files (file copy of the payments, compared with Postgres in recon)
+glossary: [Payment, Payment method]
+source:
+  kind: csv
+  table: data_sentinel.bronze.billing_payments_raw
+  file_source: billing_payments
+columns:
+  - {name: payment_id, type: bigint, required: true}
+  - {name: invoice_id, type: bigint, required: true}
+  - {name: amount, type: "decimal(10,2)", required: true}
+  - {name: method, type: string}
+  - {name: status, type: string}
+  - name: paid_at
+    type: timestamp
+    sql: "try_cast(regexp_replace(trim(`paid_at`), '[+]00$', '+00:00') AS timestamp)"
+slo: {min_pass_rate: 0.97, circuit_breaker_min_pass_rate: 0.50}
+rules:
+  - {id: PAYF_ID_NOT_NULL, type: not_null, column: payment_id, dimension: completeness, severity: critical, action: reject}
+  - {id: PAYF_ID_UNIQUE, type: unique, keys: [payment_id], order_by: [_file_name], dimension: uniqueness, severity: high, action: reject}
+  - {id: PAYF_AMOUNT_PRESENT, type: not_null, column: amount, dimension: completeness, severity: high, action: reject}
+  - {id: PAYF_AMOUNT_NON_NEGATIVE, type: range, column: amount, min: 0, dimension: validity, severity: high, action: flag}
+  - {id: PAYF_METHOD_DOMAIN, type: domain, column: method, values: [CARD, SEPA, IDEAL], dimension: domain, severity: medium, action: reject}
+  - {id: PAYF_STATUS_DOMAIN, type: domain, column: status, values: [PAID, FAILED, REFUNDED], dimension: domain, severity: medium, action: reject}
+  - {id: PAYF_PAID_NOT_FUTURE, type: not_future, column: paid_at, dimension: timeliness, severity: medium, action: reject}
+monitors:
+  freshness: {frequency: monthly, max_delay_days: 10}
+  volume: {ratio_to_median: [0.7, 1.3]}
+lineage:
+  upstream: [data_sentinel.bronze.billing_payments_raw]
+  downstream: [data_sentinel.silver.fact_payment]

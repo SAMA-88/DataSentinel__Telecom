@@ -1,0 +1,34 @@
+version: 2
+
+sources:
+  - name: silver
+    description: Rows that passed the quality gate, with SCD2 history, hashed PII and customer_xref (built by the Silver notebooks).
+    schema: silver
+    loaded_at_field: _loaded_at
+    freshness:
+      warn_after: {count: 2, period: day}
+    tables:
+      - name: customer_history
+      - name: plan_history
+      - name: customer_xref
+      - name: account
+      - name: invoice
+      - name: invoice_line
+      - name: payment
+      - name: invoice_file
+      - name: payment_file
+      - name: network_cdr
+      - name: app_event
+      - name: partner_usage
+
+  - name: monitoring
+    description: Results of the quality gate, the observability monitors and the cross-system reconciliation.
+    schema: monitoring
+    tables:
+      - name: dq_results
+      - name: dq_rules
+      - name: incidents
+      - name: incident_ops
+      - name: alerts
+      - name: recon_results
+      - name: recon_mismatches

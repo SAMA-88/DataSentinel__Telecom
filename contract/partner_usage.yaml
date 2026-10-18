@@ -1,0 +1,32 @@
+dataset: partner_usage
+version: "1.1"
+owner: Partnerships team
+description: Monthly partner usage files (roaming and international calls)
+glossary: [Partner usage record, Roaming, International call, Partner amount, Currency]
+source:
+  kind: csv
+  table: data_sentinel.bronze.partner_usage_raw
+  file_source: partner
+columns:
+  - {name: partner_record_id, type: string, required: true}
+  - {name: msisdn, type: string, required: true}
+  - {name: service, type: string, required: true}
+  - {name: amount, type: "decimal(10,2)", required: true}
+  - {name: currency, type: string, required: true}
+  - {name: period_start, type: date, required: true}
+slo: {min_pass_rate: 0.95, circuit_breaker_min_pass_rate: 0.50}
+rules:
+  - {id: PRT_ID_NOT_NULL, type: not_null, column: partner_record_id, dimension: completeness, severity: critical, action: reject}
+  - {id: PRT_ID_UNIQUE, type: unique, keys: [partner_record_id], order_by: [_file_name], dimension: uniqueness, severity: high, action: reject}
+  - {id: PRT_MSISDN_FORMAT, type: regex, column: msisdn, pattern: "^[+]316[0-9]{8}$", dimension: validity, severity: high, action: reject}
+  - {id: PRT_SERVICE_DOMAIN, type: domain, column: service, values: [ROAMING, INTL_CALL], dimension: domain, severity: medium, action: reject}
+  - {id: PRT_AMOUNT_NON_NEGATIVE, type: range, column: amount, min: 0, dimension: validity, severity: high, action: flag}
+  - {id: PRT_CURRENCY_DOMAIN, type: domain, column: currency, values: [EUR], dimension: domain, severity: medium, action: reject}
+monitors:
+  freshness: {frequency: monthly, max_delay_days: 10}
+  volume: {ratio_to_median: [0.7, 1.3]}
+  distribution:
+    - {name: avg_amount, expr: "avg(try_cast(amount AS double))", ratio_to_median: [0.5, 2.0]}
+lineage:
+  upstream: [data_sentinel.bronze.partner_usage_raw]
+  downstream: [data_sentinel.silver.fact_partner_usage]

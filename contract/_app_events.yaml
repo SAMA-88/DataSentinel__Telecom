@@ -1,0 +1,29 @@
+# DISABLED on 2026-10-13: app events are no longer loaded. Files starting with "_" are ignored by load_contracts; rename back to app_events.yaml to re-enable.
+dataset: app_events
+version: "1.0"
+owner: Digital team
+description: One row per mobile app event, streamed from Kafka topic app.events
+glossary: [App event, App event type, Customer ID in events]
+source:
+  kind: json
+  table: data_sentinel.bronze.app_events_raw
+columns:
+  - {name: event_id, type: string, required: true}
+  - {name: customer_id, type: bigint, required: true}
+  - {name: event_type, type: string, required: true}
+  - {name: app_version, type: string}
+  - {name: event_ts, type: timestamp, required: true}
+slo: {min_pass_rate: 0.95, circuit_breaker_min_pass_rate: 0.50}
+rules:
+  - {id: APP_EVENT_ID_NOT_NULL, type: not_null, column: event_id, dimension: completeness, severity: critical, action: reject}
+  - {id: APP_EVENT_ID_UNIQUE, type: unique, keys: [event_id], order_by: [_offset], dimension: uniqueness, severity: medium, action: reject}
+  - {id: APP_CUSTOMER_PRESENT, type: not_null, column: customer_id, dimension: completeness, severity: high, action: reject}
+  - {id: APP_EVENT_TYPE_DOMAIN, type: domain, column: event_type, values: [login, view_bill, topup, crash, plan_change], dimension: domain, severity: medium, action: reject}
+  - {id: APP_VERSION_FORMAT, type: regex, column: app_version, pattern: "^[0-9]+[.][0-9]+$", dimension: validity, severity: low, action: flag}
+  - {id: APP_EVENT_NOT_FUTURE, type: not_future, column: event_ts, dimension: timeliness, severity: medium, action: reject}
+monitors:
+  freshness: {type: stream, max_delay_minutes: 1440}
+  volume: {min_rows: 1}
+lineage:
+  upstream: [data_sentinel.bronze.app_events_raw]
+  downstream: [data_sentinel.silver.fact_app_events]

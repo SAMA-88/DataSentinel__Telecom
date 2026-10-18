@@ -1,0 +1,154 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Customer 360: menu open",
+  "name": "cu-menu-open",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "cu-panel",
+      "cu-logo-bg",
+      "cu-logo-icon",
+      "cu-logo-text",
+      "cu-menu-x",
+      "cu-menu-close",
+      "cu-nav-label",
+      "cu-nav-ov-txt",
+      "cu-nav-ov",
+      "cu-nav-dq-txt",
+      "cu-nav-dq",
+      "cu-nav-ra-txt",
+      "cu-nav-ra",
+      "cu-nav-in-txt",
+      "cu-nav-in",
+      "cu-nav-cu-bg",
+      "cu-nav-cu-txt",
+      "cu-nav-cu",
+      "cu-nav-nw-txt",
+      "cu-nav-nw",
+      "cu-gold-bg",
+      "cu-gold-text"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "customer-360",
+    "sections": {
+      "customer-360": {
+        "visualContainers": {
+          "cu-panel": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-logo-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-logo-icon": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cu-logo-text": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cu-menu-x": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cu-menu-close": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-nav-label": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cu-nav-ov-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cu-nav-ov": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-nav-dq-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cu-nav-dq": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-nav-ra-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cu-nav-ra": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-nav-in-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cu-nav-in": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-nav-cu-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-nav-cu-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cu-nav-cu": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-nav-nw-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "cu-nav-nw": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-gold-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "cu-gold-text": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          }
+        }
+      }
+    }
+  }
+}

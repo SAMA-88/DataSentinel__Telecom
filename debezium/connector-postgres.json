@@ -1,0 +1,23 @@
+
+
+{
+  "name": "postgres-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "postgres",
+    "database.dbname": "telecom",
+    "topic.prefix": "telecom",
+    "plugin.name": "pgoutput",
+    "publication.name": "dbz_publication",
+    "slot.name": "debezium_slot",
+    "schema.include.list": "crm,billing",
+    "table.include.list": "crm.customers,crm.devices,crm.plans,billing.accounts,billing.invoices,billing.invoice_lines,billing.payments",
+    "include.schema.changes": "false",
+    "snapshot.mode": "initial",
+    "decimal.handling.mode": "string",
+    "tombstones.on.delete": "false"
+  }
+}

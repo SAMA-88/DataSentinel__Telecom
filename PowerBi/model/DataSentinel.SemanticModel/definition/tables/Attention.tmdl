@@ -1,0 +1,65 @@
+table Attention
+	lineageTag: a902424e-22f0-479b-8285-05cbfd9038c5
+
+	column Area
+		dataType: string
+		lineageTag: 7b13f1eb-ce1a-45d3-b5bb-2a09b2523044
+		summarizeBy: none
+		sourceColumn: [Area]
+
+	column Item
+		dataType: string
+		lineageTag: abf3442f-d77c-4ee2-9741-2f23061976be
+		summarizeBy: none
+		sourceColumn: [Item]
+
+	column Issue
+		dataType: string
+		lineageTag: 0a52dbb0-9fe8-446b-bc0f-b9df169901c1
+		summarizeBy: none
+		sourceColumn: [Issue]
+
+	column Severity
+		dataType: int64
+		lineageTag: e8918d7e-21cb-4b34-800b-8b0b7c6503be
+		summarizeBy: none
+		sourceColumn: [Severity]
+
+	column Priority
+		dataType: string
+		lineageTag: d4da0a92-2035-4ec7-a230-7af89ed53656
+		summarizeBy: none
+		sourceColumn: [Priority]
+		sortByColumn: Severity
+
+	partition Attention = calculated
+		mode: import
+		source =
+				VAR dq =
+				    SELECTCOLUMNS (
+				        FILTER ( mart_dq_health, mart_dq_health[status] <> "PASS" ),
+				        "Area", "Data quality",
+				        "Item", mart_dq_health[dataset] & " · " & mart_dq_health[rule_id],
+				        "Issue", mart_dq_health[check_name] & ": " & FORMAT ( mart_dq_health[rows_failed], "#,0" ) & " rows failed",
+				        "Severity", SWITCH ( LOWER ( mart_dq_health[severity] ), "critical", 1, "high", 2, "medium", 3, 4 )
+				    )
+				VAR inc =
+				    SELECTCOLUMNS (
+				        FILTER ( mart_incidents, mart_incidents[status] <> "RESOLVED" && mart_incidents[sla_status] IN { "BREACHED", "UNASSIGNED" } ),
+				        "Area", "Incidents",
+				        "Item", mart_incidents[incident_id] & " · " & mart_incidents[priority],
+				        "Issue", mart_incidents[sla_status] & ": " & mart_incidents[description],
+				        "Severity", SWITCH ( mart_incidents[priority], "P1", 1, "P2", 2, "P3", 3, 4 )
+				    )
+				VAR rec =
+				    SELECTCOLUMNS (
+				        FILTER ( mart_revenue_assurance, mart_revenue_assurance[status] = "FAIL" ),
+				        "Area", "Revenue",
+				        "Item", mart_revenue_assurance[check_id] & " · " & mart_revenue_assurance[leak_type],
+				        "Issue", "EUR " & FORMAT ( mart_revenue_assurance[amount_at_risk_eur], "#,0" ) & " at risk, " & FORMAT ( mart_revenue_assurance[rows_mismatched], "#,0" ) & " rows",
+				        "Severity", SWITCH ( LOWER ( mart_revenue_assurance[severity] ), "critical", 1, "high", 2, "medium", 3, 4 )
+				    )
+				VAR all_items = UNION ( dq, inc, rec )
+				RETURN
+				    ADDCOLUMNS ( all_items, "Priority", SWITCH ( [Severity], 1, "Critical", 2, "High", 3, "Medium", "Low" ) )
+

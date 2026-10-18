@@ -1,0 +1,62 @@
+table mart_app_usage
+	lineageTag: 1e1aa63f-3990-47ad-b6fb-c89f77011439
+
+	column event_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c9dd5a79-d908-49d7-b042-f8ff17f43951
+		summarizeBy: none
+		sourceColumn: event_date
+
+		variation Variation
+			isDefault
+			relationship: 6c4b728c-5188-464a-9352-6f11db8dcf43
+			defaultHierarchy: LocalDateTable_5b96ef7c-13b6-4c2e-9e40-19fbc98ce6e9.'Date Hierarchy'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column event_date_key
+		dataType: int64
+		lineageTag: 94976864-6cfd-499b-8cd3-e1b1d6fc1a3b
+		summarizeBy: sum
+		sourceColumn: event_date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column app_version
+		dataType: string
+		lineageTag: 8567487c-691f-4220-b63a-7130d5db5423
+		summarizeBy: none
+		sourceColumn: app_version
+
+	column event_type
+		dataType: string
+		lineageTag: 23223178-5b65-4fd5-89b1-da4841b471c3
+		summarizeBy: none
+		sourceColumn: event_type
+
+	column events
+		dataType: int64
+		lineageTag: 606f3308-f4fe-4315-840f-5ac3fed94a53
+		summarizeBy: sum
+		sourceColumn: events
+
+	column customers
+		dataType: int64
+		lineageTag: 606efb87-2d4d-4cfd-8bb2-72a1277f4ebf
+		summarizeBy: sum
+		sourceColumn: customers
+
+	partition mart_app_usage = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_app_usage", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

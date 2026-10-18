@@ -1,0 +1,100 @@
+table mart_dq_health
+	lineageTag: 6f9b1242-4a3c-4ab4-b107-f9ba9b46e9d3
+
+	column dataset
+		dataType: string
+		lineageTag: ef302b05-6adc-43e6-b92c-cc72d3f62c48
+		summarizeBy: none
+		sourceColumn: dataset
+
+	column check_name
+		dataType: string
+		lineageTag: b3c244d8-e0ae-41f6-93b6-0c28a9eb5e11
+		summarizeBy: none
+		sourceColumn: check_name
+
+	column rule_id
+		dataType: string
+		lineageTag: f22fc9c9-bde9-4c04-b7db-1fee41dbcce7
+		summarizeBy: none
+		sourceColumn: rule_id
+
+	column dimension
+		dataType: string
+		lineageTag: 31dafae2-80ba-4ca0-9c4f-b911de0b5247
+		summarizeBy: none
+		sourceColumn: dimension
+
+	column scope
+		dataType: string
+		lineageTag: c1caefb5-0599-468d-944e-13bc8402d05d
+		summarizeBy: none
+		sourceColumn: scope
+
+	column rows_checked
+		dataType: int64
+		lineageTag: 0b21494d-7e56-43f7-af10-0ee59573c954
+		summarizeBy: sum
+		sourceColumn: rows_checked
+
+	column rows_failed
+		dataType: int64
+		lineageTag: 99833989-c8f2-4fe0-ad84-c15a1f8d0287
+		summarizeBy: sum
+		sourceColumn: rows_failed
+
+	column pass_rate
+		dataType: double
+		lineageTag: 68e57303-fa22-4134-baa6-9479a3c50047
+		summarizeBy: average
+		sourceColumn: pass_rate
+
+	column status
+		dataType: string
+		lineageTag: 3769df88-9386-4290-b515-26eec4e828aa
+		summarizeBy: none
+		sourceColumn: status
+
+	column severity
+		dataType: string
+		lineageTag: 3199e1d1-20cf-465d-a0fc-e58d7809a32d
+		summarizeBy: none
+		sourceColumn: severity
+
+	column detail
+		dataType: string
+		lineageTag: 7725dbcd-3f46-431e-b9f3-d1e068803627
+		summarizeBy: none
+		sourceColumn: detail
+
+	column contract_version
+		dataType: string
+		lineageTag: 9f68dfaf-b5ed-4a8e-925b-9fbdeec99585
+		summarizeBy: none
+		sourceColumn: contract_version
+
+	column run_id
+		dataType: string
+		lineageTag: 8b7d7679-7da1-4c9a-9628-5f0cee24f747
+		summarizeBy: none
+		sourceColumn: run_id
+
+	column run_ts
+		dataType: dateTime
+		lineageTag: d4a17cc5-39cd-41d5-a651-c295e630df25
+		summarizeBy: none
+		sourceColumn: run_ts
+
+	partition mart_dq_health = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_dq_health", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

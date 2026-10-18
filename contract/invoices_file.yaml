@@ -1,0 +1,43 @@
+dataset: invoices_file
+version: "1.1"
+owner: Billing team
+description: Monthly billing invoice files (file copy of the invoices, compared with Postgres in recon)
+glossary: [Invoice, Plan fee (PLAN_FEE), Data overage (DATA_OVERAGE), Invoice total]
+source:
+  kind: csv
+  table: data_sentinel.bronze.billing_invoices_raw
+  file_source: billing_invoices
+columns:
+  - {name: invoice_id, type: bigint, required: true}
+  - {name: account_ref, type: string, required: true}
+  - {name: msisdn, type: string, required: true}
+  - {name: period_start, type: date, required: true}
+  - {name: period_end, type: date, required: true}
+  - {name: plan_fee, type: "decimal(10,2)", required: true}
+  - {name: overage, type: "decimal(10,2)", required: true}
+  - {name: total_amount, type: "decimal(10,2)", required: true}
+  - {name: status, type: string}
+slo: {min_pass_rate: 0.97, circuit_breaker_min_pass_rate: 0.50}
+rules:
+  - {id: INVF_ID_NOT_NULL, type: not_null, column: invoice_id, dimension: completeness, severity: critical, action: reject}
+  - {id: INVF_ID_UNIQUE, type: unique, keys: [invoice_id], order_by: [_file_name], dimension: uniqueness, severity: high, action: reject}
+  - {id: INVF_MSISDN_FORMAT, type: regex, column: msisdn, pattern: "^[+]316[0-9]{8}$", dimension: validity, severity: high, action: reject}
+  - {id: INVF_TOTAL_NON_NEGATIVE, type: range, column: total_amount, min: 0, dimension: validity, severity: high, action: flag}
+  - {id: INVF_OVERAGE_NON_NEGATIVE, type: range, column: overage, min: 0, dimension: validity, severity: high, action: flag}
+  - {id: INVF_PERIOD_ORDER, type: compare, left: period_start, op: "<=", right: period_end, dimension: validity, severity: medium, action: reject}
+  - {id: INVF_STATUS_DOMAIN, type: domain, column: status, values: [ISSUED, PAID, OVERDUE, CANCELLED], dimension: domain, severity: medium, action: reject}
+  - id: INVF_TOTAL_CONSISTENT
+    type: expr
+    valid_when: "abs(t_total_amount - (t_plan_fee + t_overage)) <= 0.01"
+    dimension: accuracy
+    severity: high
+    action: flag
+    description: Invoice total must equal plan fee plus overage
+monitors:
+  freshness: {frequency: monthly, max_delay_days: 10}
+  volume: {ratio_to_median: [0.8, 1.25]}
+  distribution:
+    - {name: avg_total_amount, expr: "avg(try_cast(total_amount AS double))", ratio_to_median: [0.7, 1.5]}
+lineage:
+  upstream: [data_sentinel.bronze.billing_invoices_raw]
+  downstream: [data_sentinel.silver.fact_invoice]

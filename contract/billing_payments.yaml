@@ -1,0 +1,31 @@
+dataset: billing_payments
+version: "1.1"
+owner: Finance team
+description: One row per payment change event from Postgres billing.payments
+glossary: [Payment, Payment method, Unpaid invoice]
+source:
+  kind: cdc
+  table: data_sentinel.bronze.cdc_events
+  topic: telecom.billing.payments
+  key: [payment_id]
+columns:
+  - {name: payment_id, type: bigint, required: true}
+  - {name: invoice_id, type: bigint, required: true}
+  - {name: amount, type: "decimal(10,2)", required: true}
+  - {name: method, type: string}
+  - {name: status, type: string}
+  - {name: paid_at, type: timestamp}
+slo: {min_pass_rate: 0.97, circuit_breaker_min_pass_rate: 0.50}
+rules:
+  - {id: PAY_ID_NOT_NULL, type: not_null, column: payment_id, dimension: completeness, severity: critical, action: reject}
+  - {id: PAY_AMOUNT_PRESENT, type: not_null, column: amount, dimension: completeness, severity: high, action: reject}
+  - {id: PAY_AMOUNT_NON_NEGATIVE, type: range, column: amount, min: 0, dimension: validity, severity: high, action: flag}
+  - {id: PAY_METHOD_PRESENT, type: not_null, column: method, dimension: completeness, severity: low, action: flag}
+  - {id: PAY_METHOD_DOMAIN, type: domain, column: method, values: [CARD, SEPA, IDEAL], dimension: domain, severity: medium, action: reject}
+  - {id: PAY_STATUS_DOMAIN, type: domain, column: status, values: [PAID, FAILED, REFUNDED], dimension: domain, severity: medium, action: reject}
+  - {id: PAY_PAID_NOT_FUTURE, type: not_future, column: paid_at, dimension: timeliness, severity: medium, action: reject}
+monitors:
+  freshness: {type: stream, max_delay_minutes: 1440}
+lineage:
+  upstream: [data_sentinel.bronze.cdc_events]
+  downstream: [data_sentinel.silver.fact_payment]

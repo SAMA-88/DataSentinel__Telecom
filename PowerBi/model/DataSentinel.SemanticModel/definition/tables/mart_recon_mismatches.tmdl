@@ -1,0 +1,79 @@
+table mart_recon_mismatches
+	lineageTag: ce087574-9542-4649-8a84-d479d1cdaa3c
+
+	column check_id
+		dataType: string
+		lineageTag: 6eaafad2-8453-4bf5-ab9b-d8392f319d6c
+		summarizeBy: none
+		sourceColumn: check_id
+
+	column entity_type
+		dataType: string
+		lineageTag: e4d118b0-34c2-41b1-9469-74369d140cf9
+		summarizeBy: none
+		sourceColumn: entity_type
+
+	column entity_key
+		dataType: string
+		lineageTag: f499a973-9841-427e-bd10-1f0bbdee3770
+		summarizeBy: none
+		sourceColumn: entity_key
+
+	column value_a
+		dataType: double
+		lineageTag: cf34d176-df41-432d-86aa-f22f1e3f44a3
+		summarizeBy: sum
+		sourceColumn: value_a
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column value_b
+		dataType: double
+		lineageTag: 2b3ec852-e62c-4fd0-8531-9dfd5742bec3
+		summarizeBy: sum
+		sourceColumn: value_b
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column diff
+		dataType: double
+		lineageTag: 3d5b5d99-837c-4486-be8f-02c55c9a8ce3
+		summarizeBy: sum
+		sourceColumn: diff
+
+	column amount_at_risk_eur
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 42bc9d86-1816-4f87-8d7b-906129eb73f2
+		summarizeBy: sum
+		sourceColumn: amount_at_risk_eur
+
+	column reason
+		dataType: string
+		lineageTag: d2ad8a52-0d13-40ac-a509-35e1e8d55cd0
+		summarizeBy: none
+		sourceColumn: reason
+
+	column run_id
+		dataType: string
+		lineageTag: 7f2b4708-d910-4edb-a9e0-f135e5b49269
+		summarizeBy: none
+		sourceColumn: run_id
+
+	partition mart_recon_mismatches = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_recon_mismatches", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

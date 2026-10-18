@@ -1,0 +1,56 @@
+table mart_partner_usage
+	lineageTag: da931fe6-b6e3-426e-94d9-db74eb588fe5
+
+	column period_start
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7c4c81de-92a6-4227-9273-62898e81674d
+		summarizeBy: none
+		sourceColumn: period_start
+
+		variation Variation
+			isDefault
+			relationship: fc9774a4-6044-49e1-ad41-a5a49cfba70a
+			defaultHierarchy: LocalDateTable_ecca7902-1083-4968-80c2-1f44d4e00dfa.'Date Hierarchy'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column service
+		dataType: string
+		lineageTag: 3af35420-afcd-4ee7-b2cd-114535892bc2
+		summarizeBy: none
+		sourceColumn: service
+
+	column records
+		dataType: int64
+		lineageTag: e6ac9680-fd3b-45b0-b2ef-6cb41381ff66
+		summarizeBy: sum
+		sourceColumn: records
+
+	column amount_eur
+		dataType: double
+		formatString: #,0.00
+		lineageTag: b0510dd2-8dc7-4fba-9e6d-d805da112e8e
+		summarizeBy: sum
+		sourceColumn: amount_eur
+
+	column amount_unknown_customer_eur
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 6cb6231a-0b46-4b29-b583-6a16ac9b9811
+		summarizeBy: sum
+		sourceColumn: amount_unknown_customer_eur
+
+	partition mart_partner_usage = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_partner_usage", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

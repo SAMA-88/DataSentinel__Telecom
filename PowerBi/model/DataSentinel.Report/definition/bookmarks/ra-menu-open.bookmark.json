@@ -1,0 +1,154 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Revenue Assurance: menu open",
+  "name": "ra-menu-open",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "ra-panel",
+      "ra-logo-bg",
+      "ra-logo-icon",
+      "ra-logo-text",
+      "ra-menu-x",
+      "ra-menu-close",
+      "ra-nav-label",
+      "ra-nav-ov-txt",
+      "ra-nav-ov",
+      "ra-nav-dq-txt",
+      "ra-nav-dq",
+      "ra-nav-ra-bg",
+      "ra-nav-ra-txt",
+      "ra-nav-ra",
+      "ra-nav-in-txt",
+      "ra-nav-in",
+      "ra-nav-cu-txt",
+      "ra-nav-cu",
+      "ra-nav-nw-txt",
+      "ra-nav-nw",
+      "ra-gold-bg",
+      "ra-gold-text"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "revenue-assurance",
+    "sections": {
+      "revenue-assurance": {
+        "visualContainers": {
+          "ra-panel": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-logo-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-logo-icon": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "ra-logo-text": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "ra-menu-x": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "ra-menu-close": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-nav-label": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "ra-nav-ov-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "ra-nav-ov": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-nav-dq-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "ra-nav-dq": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-nav-ra-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-nav-ra-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "ra-nav-ra": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-nav-in-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "ra-nav-in": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-nav-cu-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "ra-nav-cu": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-nav-nw-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "ra-nav-nw": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-gold-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "ra-gold-text": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          }
+        }
+      }
+    }
+  }
+}

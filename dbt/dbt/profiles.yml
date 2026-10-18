@@ -1,0 +1,14 @@
+# Copy to  %USERPROFILE%\.dbt\profiles.yml  (Windows)  or  ~/.dbt/profiles.yml
+# http_path: Databricks > SQL Warehouses > your warehouse > Connection details
+# token: create a personal access token and set it as an environment variable (never write it in this file)
+dbt_sentinel:
+  target: dev
+  outputs:
+    dev:
+      type: databricks
+      host: dbc-21b8c56c-c07d.cloud.databricks.com
+      http_path: /sql/1.0/warehouses/551fe0674560cc7c
+      token: "{{ env_var('DATABRICKS_TOKEN') }}"
+      catalog: data_sentinel
+      schema: gold
+      threads: 4

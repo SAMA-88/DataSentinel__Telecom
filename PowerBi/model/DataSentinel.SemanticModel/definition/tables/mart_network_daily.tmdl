@@ -1,0 +1,83 @@
+table mart_network_daily
+	lineageTag: 41202a26-8cc7-4827-a1a4-4aac26a026a9
+
+	column usage_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 8a3cce7b-33bf-4bea-9209-5a7873affb19
+		summarizeBy: none
+		sourceColumn: usage_date
+
+		variation Variation
+			isDefault
+			relationship: 819e71e0-ce5c-4488-84ed-ee6f58434858
+			defaultHierarchy: LocalDateTable_69f001bc-270d-4ca2-8f11-6346b0d0beb6.'Date Hierarchy'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column usage_date_key
+		dataType: int64
+		lineageTag: 73e7d1ff-e681-46a0-82df-b7094bb248e1
+		summarizeBy: sum
+		sourceColumn: usage_date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_type
+		dataType: string
+		lineageTag: 702a7177-87ef-42dd-9df4-29a2b1568b9c
+		summarizeBy: none
+		sourceColumn: event_type
+
+	column records
+		dataType: int64
+		lineageTag: cb83d24c-244b-463b-b2f0-0e1d77d26910
+		summarizeBy: sum
+		sourceColumn: records
+
+	column active_numbers
+		dataType: int64
+		lineageTag: 7ea765d2-93ad-4e3b-8dbd-81642a7cf206
+		summarizeBy: sum
+		sourceColumn: active_numbers
+
+	column minutes
+		dataType: double
+		lineageTag: ae552ba1-07a4-49f6-8bf9-847ca24b27bb
+		summarizeBy: sum
+		sourceColumn: minutes
+
+	column data_mb
+		dataType: double
+		lineageTag: 3842fc63-15ac-40cf-a167-d960dc1c4e5f
+		summarizeBy: sum
+		sourceColumn: data_mb
+
+	column dropped
+		dataType: int64
+		lineageTag: 1f57e2b4-12b3-417e-bf4b-4b6a17a4b3f3
+		summarizeBy: sum
+		sourceColumn: dropped
+
+	column drop_rate
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 629d1744-cc16-4a03-a4f4-b2c5d9406f01
+		summarizeBy: sum
+		sourceColumn: drop_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition mart_network_daily = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_network_daily", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmarksMetadata/1.0.0/schema.json",
+  "items": [
+    {
+      "name": "ov-menu-open"
+    },
+    {
+      "name": "ov-menu-closed"
+    },
+    {
+      "name": "dq-menu-open"
+    },
+    {
+      "name": "dq-menu-closed"
+    },
+    {
+      "name": "ra-menu-open"
+    },
+    {
+      "name": "ra-menu-closed"
+    },
+    {
+      "name": "in-menu-open"
+    },
+    {
+      "name": "in-menu-closed"
+    },
+    {
+      "name": "cu-menu-open"
+    },
+    {
+      "name": "cu-menu-closed"
+    },
+    {
+      "name": "nw-menu-open"
+    },
+    {
+      "name": "nw-menu-closed"
+    }
+  ]
+}

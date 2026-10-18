@@ -1,0 +1,38 @@
+dataset: network_cdr
+version: "1.1"
+owner: Network operations
+description: One row per call, SMS or data session (daily CDR files)
+glossary: [CDR, Event type, Call duration, Data volume, Cell, Call result]
+source:
+  kind: csv
+  table: data_sentinel.bronze.network_cdr_raw
+  file_source: network
+columns:
+  - {name: cdr_id, type: string, required: true}
+  - {name: msisdn, type: string, required: true}
+  - {name: event_type, type: string, required: true}
+  - {name: event_ts, type: timestamp, required: true}
+  - {name: duration_sec, type: int, required: true}
+  - {name: data_mb, type: "decimal(12,2)", required: true}
+  - {name: cell_id, type: string, required: false}   # optional: a missing cell_id is only flagged (NET_CELL_PRESENT)
+  - {name: call_result, type: string, required: true}
+slo: {min_pass_rate: 0.95, circuit_breaker_min_pass_rate: 0.30}
+rules:
+  - {id: NET_CDR_ID_NOT_NULL, type: not_null, column: cdr_id, dimension: completeness, severity: critical, action: reject}
+  - {id: NET_CDR_ID_UNIQUE, type: unique, keys: [cdr_id], order_by: [_file_name], dimension: uniqueness, severity: high, action: reject}
+  - {id: NET_MSISDN_FORMAT, type: regex, column: msisdn, pattern: "^[+]316[0-9]{8}$", dimension: validity, severity: high, action: reject}
+  - {id: NET_EVENT_TYPE_DOMAIN, type: domain, column: event_type, values: [VOICE, SMS, DATA], dimension: domain, severity: high, action: reject}
+  - {id: NET_EVENT_NOT_FUTURE, type: not_future, column: event_ts, dimension: timeliness, severity: medium, action: reject}
+  - {id: NET_DURATION_NON_NEGATIVE, type: range, column: duration_sec, min: 0, dimension: validity, severity: high, action: reject}
+  - {id: NET_DATA_NON_NEGATIVE, type: range, column: data_mb, min: 0, dimension: validity, severity: medium, action: reject}
+  - {id: NET_CELL_PRESENT, type: not_null, column: cell_id, dimension: completeness, severity: low, action: flag}
+  - {id: NET_RESULT_DOMAIN, type: domain, column: call_result, values: [COMPLETED, DROPPED], dimension: domain, severity: medium, action: reject}
+monitors:
+  freshness: {frequency: daily, max_delay_days: 1}
+  volume: {min_rows: 1000, max_rows: 20000, ratio_to_median: [0.5, 2.0]}
+  distribution:
+    - {name: avg_data_mb, expr: "avg(try_cast(data_mb AS double))", where: "event_type = 'DATA'", ratio_to_median: [0.5, 3.0]}
+    - {name: drop_rate, expr: "avg(CASE WHEN call_result = 'DROPPED' THEN 1.0 ELSE 0.0 END)", where: "event_type = 'VOICE'", abs_diff_to_median: 0.15}
+lineage:
+  upstream: [data_sentinel.bronze.network_cdr_raw]
+  downstream: [data_sentinel.silver.fact_usage]

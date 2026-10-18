@@ -1,0 +1,28 @@
+relationship 6c4b728c-5188-464a-9352-6f11db8dcf43
+	joinOnDateBehavior: datePartOnly
+	fromColumn: mart_app_usage.event_date
+	toColumn: LocalDateTable_5b96ef7c-13b6-4c2e-9e40-19fbc98ce6e9.Date
+
+relationship 3004a088-ce2a-4981-9dfe-967aaf440f52
+	joinOnDateBehavior: datePartOnly
+	fromColumn: mart_dq_trend.run_date
+	toColumn: LocalDateTable_c243d746-ab21-4187-948c-9237978ab976.Date
+
+relationship 819e71e0-ce5c-4488-84ed-ee6f58434858
+	joinOnDateBehavior: datePartOnly
+	fromColumn: mart_network_daily.usage_date
+	toColumn: LocalDateTable_69f001bc-270d-4ca2-8f11-6346b0d0beb6.Date
+
+relationship fc9774a4-6044-49e1-ad41-a5a49cfba70a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: mart_partner_usage.period_start
+	toColumn: LocalDateTable_ecca7902-1083-4968-80c2-1f44d4e00dfa.Date
+
+relationship 6d1f0c52-1a7e-4c1b-9b1e-3c0a5f000001
+	fromColumn: mart_recon_mismatches.check_id
+	toColumn: mart_revenue_assurance.check_id
+
+relationship 6d1f0c52-1a7e-4c1b-9b1e-3c0a5f000002
+	fromColumn: mart_revenue_assurance_trend.check_id
+	toColumn: mart_revenue_assurance.check_id
+

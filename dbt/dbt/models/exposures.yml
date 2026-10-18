@@ -1,0 +1,30 @@
+version: 2
+
+exposures:
+  - name: dashboard_data_quality_health
+    type: dashboard
+    maturity: medium
+    owner: {name: Data quality team, email: ahmedzaki9393.1@gmail.com}
+    description: Is today's data trustworthy, and who owns what broke?
+    depends_on: [ref('mart_dq_health'), ref('mart_dq_trend'), ref('mart_quarantine'), ref('mart_incidents')]
+
+  - name: dashboard_revenue_assurance
+    type: dashboard
+    maturity: medium
+    owner: {name: Finance and billing, email: ahmedzaki9393.1@gmail.com}
+    description: How many EUR are at risk because the systems disagree?
+    depends_on: [ref('mart_revenue_assurance'), ref('mart_revenue_assurance_trend'), ref('mart_recon_mismatches')]
+
+  - name: dashboard_customer_360
+    type: dashboard
+    maturity: medium
+    owner: {name: Customer care, email: ahmedzaki9393.1@gmail.com}
+    description: Everything we know about one customer in one place (masked PII).
+    depends_on: [ref('mart_customer_360')]
+
+  - name: dashboard_network_app_usage
+    type: dashboard
+    maturity: medium
+    owner: {name: Network operations and digital team, email: ahmedzaki9393.1@gmail.com}
+    description: Network load, dropped calls per cell, app events and crashes, partner usage.
+    depends_on: [ref('mart_network_daily'), ref('mart_cell_quality'), ref('mart_app_usage'), ref('mart_partner_usage')]

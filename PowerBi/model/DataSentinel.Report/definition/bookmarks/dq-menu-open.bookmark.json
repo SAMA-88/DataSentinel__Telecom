@@ -1,0 +1,154 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Data Quality: menu open",
+  "name": "dq-menu-open",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "dq-panel",
+      "dq-logo-bg",
+      "dq-logo-icon",
+      "dq-logo-text",
+      "dq-menu-x",
+      "dq-menu-close",
+      "dq-nav-label",
+      "dq-nav-ov-txt",
+      "dq-nav-ov",
+      "dq-nav-dq-bg",
+      "dq-nav-dq-txt",
+      "dq-nav-dq",
+      "dq-nav-ra-txt",
+      "dq-nav-ra",
+      "dq-nav-in-txt",
+      "dq-nav-in",
+      "dq-nav-cu-txt",
+      "dq-nav-cu",
+      "dq-nav-nw-txt",
+      "dq-nav-nw",
+      "dq-gold-bg",
+      "dq-gold-text"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "data-quality",
+    "sections": {
+      "data-quality": {
+        "visualContainers": {
+          "dq-panel": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-logo-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-logo-icon": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "dq-logo-text": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "dq-menu-x": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "dq-menu-close": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-nav-label": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "dq-nav-ov-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "dq-nav-ov": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-nav-dq-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-nav-dq-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "dq-nav-dq": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-nav-ra-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "dq-nav-ra": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-nav-in-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "dq-nav-in": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-nav-cu-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "dq-nav-cu": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-nav-nw-txt": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          },
+          "dq-nav-nw": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-gold-bg": {
+            "singleVisual": {
+              "visualType": "shape"
+            }
+          },
+          "dq-gold-text": {
+            "singleVisual": {
+              "visualType": "textbox"
+            }
+          }
+        }
+      }
+    }
+  }
+}

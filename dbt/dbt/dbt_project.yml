@@ -1,0 +1,41 @@
+# This file tells dbt what the project is called and where its files are.
+name: dbt_sentinel
+version: "1.0.0"
+config-version: 2
+profile: dbt_sentinel          # the connection settings live in your profiles.yml
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+
+# Variables you can change
+vars:
+  date_start: "2024-01-01"     # first day in dim_date
+  date_end: "2028-12-31"       # last day in dim_date
+  # The 11 datasets that go through the quality gate (used to find the quarantine tables)
+  datasets: [crm_customers, crm_plans, billing_accounts, billing_invoices, billing_invoice_lines, billing_payments,
+             invoices_file, payments_file, network_cdr, app_events, partner_usage]
+
+# Where each folder of models is built, and as what (view = saved query, table = saved data)
+models:
+  dbt_sentinel:
+    staging:
+      +schema: gold_staging
+      +materialized: view
+    intermediate:
+      +schema: gold_staging
+      +materialized: view
+    dims:
+      +schema: gold
+      +materialized: table
+    facts:
+      +schema: gold
+      +materialized: table
+    marts:
+      +schema: gold
+      +materialized: table
+
+# When a test fails, save the failing rows in a table (schema gold_tests) so you can look at them
+data_tests:
+  +store_failures: true
+  +schema: gold_tests

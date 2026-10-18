@@ -1,0 +1,59 @@
+table mart_revenue_assurance_trend
+	lineageTag: 51df0065-4825-4c32-8509-f4366422495e
+
+	column run_id
+		dataType: string
+		lineageTag: b37d7ae4-bf7a-4030-a9a5-2eceb86df401
+		summarizeBy: none
+		sourceColumn: run_id
+
+	column run_ts
+		dataType: dateTime
+		lineageTag: f435fe74-d1d6-42cb-bcbf-8545edb168ed
+		summarizeBy: none
+		sourceColumn: run_ts
+
+	column check_id
+		dataType: string
+		lineageTag: 7cc6339a-34af-4fba-a0c2-bb695b75021f
+		summarizeBy: none
+		sourceColumn: check_id
+
+	column check_name
+		dataType: string
+		lineageTag: ec188446-30f8-4485-9eb8-84ef5ae3966e
+		summarizeBy: none
+		sourceColumn: check_name
+
+	column rows_mismatched
+		dataType: int64
+		lineageTag: f2e8fdc6-516e-47fd-80d0-776d62d75a87
+		summarizeBy: sum
+		sourceColumn: rows_mismatched
+
+	column amount_at_risk_eur
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 812b1cad-40bf-4598-b50b-966e7e655422
+		summarizeBy: sum
+		sourceColumn: amount_at_risk_eur
+
+	column status
+		dataType: string
+		lineageTag: 41124c77-cd56-49d3-8a59-d450bfe0c72c
+		summarizeBy: none
+		sourceColumn: status
+
+	partition mart_revenue_assurance_trend = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_revenue_assurance_trend", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

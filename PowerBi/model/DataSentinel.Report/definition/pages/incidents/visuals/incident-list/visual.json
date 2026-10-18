@@ -1,0 +1,420 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "incident-list",
+  "position": {
+    "x": 30,
+    "y": 616,
+    "z": 57,
+    "width": 1859,
+    "height": 323,
+    "tabOrder": 57
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_incidents"
+                    }
+                  },
+                  "Property": "incident_id"
+                }
+              },
+              "queryRef": "mart_incidents.incident_id",
+              "nativeQueryRef": "incident_id",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_incidents"
+                    }
+                  },
+                  "Property": "priority"
+                }
+              },
+              "queryRef": "mart_incidents.priority",
+              "nativeQueryRef": "priority",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_incidents"
+                    }
+                  },
+                  "Property": "dataset"
+                }
+              },
+              "queryRef": "mart_incidents.dataset",
+              "nativeQueryRef": "dataset",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_incidents"
+                    }
+                  },
+                  "Property": "check_name"
+                }
+              },
+              "queryRef": "mart_incidents.check_name",
+              "nativeQueryRef": "check_name",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_incidents"
+                    }
+                  },
+                  "Property": "description"
+                }
+              },
+              "queryRef": "mart_incidents.description",
+              "nativeQueryRef": "description",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_incidents"
+                    }
+                  },
+                  "Property": "owner"
+                }
+              },
+              "queryRef": "mart_incidents.owner",
+              "nativeQueryRef": "owner",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_incidents"
+                    }
+                  },
+                  "Property": "team"
+                }
+              },
+              "queryRef": "mart_incidents.team",
+              "nativeQueryRef": "team",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_incidents"
+                    }
+                  },
+                  "Property": "status"
+                }
+              },
+              "queryRef": "mart_incidents.status",
+              "nativeQueryRef": "status",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_incidents"
+                    }
+                  },
+                  "Property": "due_at"
+                }
+              },
+              "queryRef": "mart_incidents.due_at",
+              "nativeQueryRef": "due_at",
+              "active": true
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Function": 4,
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "mart_incidents"
+                        }
+                      },
+                      "Property": "escalation_level"
+                    }
+                  }
+                }
+              },
+              "queryRef": "Max(mart_incidents.escalation_level)",
+              "nativeQueryRef": "Max of escalation_level"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Function": 4,
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "mart_incidents"
+                        }
+                      },
+                      "Property": "open_hours"
+                    }
+                  }
+                }
+              },
+              "queryRef": "Max(mart_incidents.open_hours)",
+              "nativeQueryRef": "Max of open_hours"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "mart_incidents"
+                    }
+                  },
+                  "Property": "sla_status"
+                }
+              },
+              "queryRef": "mart_incidents.sla_status",
+              "nativeQueryRef": "sla_status",
+              "active": true
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "mart_incidents"
+                  }
+                },
+                "Property": "due_at"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#3A3A3A'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "width": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Incident list (sorted by due_at)'"
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'center'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2B2B2B'"
+                    }
+                  }
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "legend": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Color SLA Status"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "mart_incidents.sla_status"
+          }
+        }
+      ]
+    }
+  }
+}

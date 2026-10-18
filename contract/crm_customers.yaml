@@ -1,0 +1,59 @@
+dataset: crm_customers
+version: "1.0"
+owner: CRM team
+description: One row per customer change event (snapshot, insert, update) from Postgres crm.customers
+glossary: [Customer, Customer status, MSISDN]
+source:
+  kind: cdc
+  table: data_sentinel.bronze.cdc_events
+  topic: telecom.crm.customers
+  key: [customer_id]
+columns:
+  - {name: customer_id, type: bigint, required: true}
+  - {name: first_name, type: string}
+  - {name: last_name, type: string}
+  - {name: email, type: string}
+  - {name: msisdn, type: string, required: true}
+  - {name: city, type: string}
+  - {name: country, type: string}
+  - {name: status, type: string, required: true}
+  - {name: plan_id, type: int, required: true}
+  - {name: created_at, type: timestamp}
+  - {name: updated_at, type: timestamp}
+slo:
+  min_pass_rate: 0.97
+  circuit_breaker_min_pass_rate: 0.50
+rules:
+  - {id: CUST_ID_NOT_NULL, type: not_null, column: customer_id, dimension: completeness, severity: critical, action: reject}
+  - {id: CUST_MSISDN_FORMAT, type: regex, column: msisdn, pattern: "^[+]316[0-9]{8}$", dimension: validity, severity: high, action: autofix}
+  - {id: CUST_EMAIL_PRESENT, type: not_null, column: email, dimension: completeness, severity: low, action: flag}
+  - {id: CUST_EMAIL_FORMAT, type: regex, column: email, pattern: '^[^\sA-Z@]+@[a-z0-9.-]+[.][a-z]{2,}$', dimension: validity, severity: medium, action: autofix}
+  - {id: CUST_STATUS_DOMAIN, type: domain, column: status, values: [ACTIVE, SUSPENDED, CHURNED], dimension: domain, severity: high, action: reject}
+  - {id: CUST_CREATED_NOT_FUTURE, type: not_future, column: created_at, dimension: timeliness, severity: medium, action: reject}
+  - id: CUST_DUPLICATE
+    type: unique
+    keys: [msisdn, email]
+    order_by: [customer_id]
+    when: "_is_latest AND msisdn RLIKE '^[+]316[0-9]{8}$' AND email IS NOT NULL"
+    dimension: uniqueness
+    severity: high
+    action: reject
+    description: Same MSISDN and email on two customers (the lower customer_id is kept)
+fixes:
+  - column: msisdn
+    steps:
+      - {op: trim}
+      - {op: regex_replace, pattern: "[ -]", replacement: ""}
+      - {op: regex_replace, pattern: "^0(6[0-9]{8})$", replacement: "+31$1"}
+    examples: [["0612345678", "+31612345678"], ["06 12345678", "+31612345678"], ["06-12345678", "+31612345678"]]
+    unfixable: ["ABC", "0612345", "+31-bad"]
+  - column: email
+    steps:
+      - {op: trim}
+      - {op: lower}
+    examples: [["  LUCAS.4@EXAMPLE.NL ", "lucas.4@example.nl"]]
+monitors:
+  freshness: {type: stream, max_delay_minutes: 1440}
+lineage:
+  upstream: [data_sentinel.bronze.cdc_events]
+  downstream: [data_sentinel.silver.dim_customer, data_sentinel.silver.customer_xref]

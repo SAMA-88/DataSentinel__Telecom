@@ -1,0 +1,11 @@
+dbt_sentinel:
+  target: dev
+  outputs:
+    dev:
+      type: databricks
+      host: dbc-21b8c56c-c07d.cloud.databricks.com
+      http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+      token: "{{ env_var('DATABRICKS_TOKEN') }}"
+      catalog: data_sentinel
+      schema: gold
+      threads: 4

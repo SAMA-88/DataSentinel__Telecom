@@ -1,0 +1,40 @@
+table mart_quarantine
+	lineageTag: 347a9002-1798-4198-8285-a2b8ff90f350
+
+	column dataset
+		dataType: string
+		lineageTag: 6e54bb81-ad24-4588-a94b-19bbd2dcd651
+		summarizeBy: none
+		sourceColumn: dataset
+
+	column quarantine_status
+		dataType: string
+		lineageTag: 46b12665-d6cc-441b-8284-bb7155d8b6c3
+		summarizeBy: none
+		sourceColumn: quarantine_status
+
+	column rows
+		dataType: int64
+		lineageTag: 257dcce4-cda2-4e2d-9080-4fa88473a45d
+		summarizeBy: sum
+		sourceColumn: rows
+
+	column oldest_quarantined_at
+		dataType: dateTime
+		lineageTag: 53d43215-f5cc-4886-b404-aa4b7cd65bd4
+		summarizeBy: none
+		sourceColumn: oldest_quarantined_at
+
+	partition mart_quarantine = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_quarantine", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

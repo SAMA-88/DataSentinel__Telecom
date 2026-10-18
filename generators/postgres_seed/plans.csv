@@ -1,0 +1,21 @@
+plan_id,plan_name,monthly_fee,data_gb,voice_minutes
+1,Basic S,10,2,100
+2,Basic M,12,5,200
+3,Basic L,15,8,300
+4,Plus S,18,10,300
+5,Plus M,20,15,400
+6,Plus L,25,20,500
+7,Pro S,28,30,600
+8,Pro M,32,50,800
+9,Pro L,40,100,1000
+10,Family 2,45,100,1500
+11,Family 4,65,200,3000
+12,Student,14,12,300
+13,Senior,13,3,500
+14,Business S,35,40,1000
+15,Business M,50,100,2000
+16,Business L,70,250,5000
+17,Data only 50,22,50,0
+18,Data only 200,38,200,0
+19,Unlimited,60,500,5000
+20,Unlimited Max,80,1000,9999

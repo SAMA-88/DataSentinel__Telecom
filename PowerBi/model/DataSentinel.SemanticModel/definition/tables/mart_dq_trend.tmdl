@@ -1,0 +1,62 @@
+table mart_dq_trend
+	lineageTag: 047f1b8e-aecb-49c1-9e60-6507ac523144
+
+	column run_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 803d98a1-14a0-47f0-88c5-f624ae3f298c
+		summarizeBy: none
+		sourceColumn: run_date
+
+		variation Variation
+			isDefault
+			relationship: 3004a088-ce2a-4981-9dfe-967aaf440f52
+			defaultHierarchy: LocalDateTable_c243d746-ab21-4187-948c-9237978ab976.'Date Hierarchy'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column dataset
+		dataType: string
+		lineageTag: da1f235f-1f1b-4d0e-8a92-1b0d75093a20
+		summarizeBy: none
+		sourceColumn: dataset
+
+	column dimension
+		dataType: string
+		lineageTag: 6b88a551-aa56-4e8d-b989-523046fae515
+		summarizeBy: none
+		sourceColumn: dimension
+
+	column rows_checked
+		dataType: int64
+		lineageTag: 7d5b6369-7546-4be6-816f-702fd8f75c24
+		summarizeBy: sum
+		sourceColumn: rows_checked
+
+	column rows_failed
+		dataType: int64
+		lineageTag: 82a6afac-ad92-47a9-b2d3-3a9a3097e464
+		summarizeBy: sum
+		sourceColumn: rows_failed
+
+	column pass_rate
+		dataType: double
+		lineageTag: 64a7eb72-c51b-4d7d-a6c4-3dc21448f96c
+		summarizeBy: sum
+		sourceColumn: pass_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition mart_dq_trend = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_dq_trend", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+

@@ -1,0 +1,37 @@
+dataset: billing_accounts
+version: "1.0"
+owner: Billing team
+description: One row per billing account change event from Postgres billing.accounts
+glossary: [Billing account, Account reference, MSISDN]
+source:
+  kind: cdc
+  table: data_sentinel.bronze.cdc_events
+  topic: telecom.billing.accounts
+  key: [account_id]
+columns:
+  - {name: account_id, type: bigint, required: true}
+  - {name: msisdn, type: string, required: true}
+  - {name: account_ref, type: string, required: true}
+  - {name: status, type: string}
+  - {name: created_at, type: timestamp}
+  - {name: updated_at, type: timestamp}
+slo: {min_pass_rate: 0.97, circuit_breaker_min_pass_rate: 0.50}
+rules:
+  - {id: ACC_ID_NOT_NULL, type: not_null, column: account_id, dimension: completeness, severity: critical, action: reject}
+  - {id: ACC_MSISDN_FORMAT, type: regex, column: msisdn, pattern: "^[+]316[0-9]{8}$", dimension: validity, severity: high, action: autofix}
+  - {id: ACC_REF_FORMAT, type: regex, column: account_ref, pattern: "^ACC-[A-Z0-9]+$", dimension: validity, severity: medium, action: reject}
+  - {id: ACC_STATUS_DOMAIN, type: domain, column: status, values: [OPEN, CLOSED, SUSPENDED], dimension: domain, severity: medium, action: reject}
+  - {id: ACC_CREATED_NOT_FUTURE, type: not_future, column: created_at, dimension: timeliness, severity: medium, action: reject}
+fixes:
+  - column: msisdn
+    steps:
+      - {op: trim}
+      - {op: regex_replace, pattern: "[ -]", replacement: ""}
+      - {op: regex_replace, pattern: "^0(6[0-9]{8})$", replacement: "+31$1"}
+    examples: [["0612345678", "+31612345678"]]
+    unfixable: ["ABC", "0612345", "+31-bad"]
+monitors:
+  freshness: {type: stream, max_delay_minutes: 1440}
+lineage:
+  upstream: [data_sentinel.bronze.cdc_events]
+  downstream: [data_sentinel.silver.customer_xref]

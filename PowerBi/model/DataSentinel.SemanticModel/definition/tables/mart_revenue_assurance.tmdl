@@ -1,0 +1,101 @@
+table mart_revenue_assurance
+	lineageTag: ac81240a-5aa9-45b9-9b37-659c5fbe5994
+
+	column check_id
+		dataType: string
+		lineageTag: d9fc90f3-a9e8-44b2-8842-6486c447ea74
+		summarizeBy: none
+		sourceColumn: check_id
+
+	column check_name
+		dataType: string
+		lineageTag: 82c86b81-717e-46e6-8822-f733a7c9f472
+		summarizeBy: none
+		sourceColumn: check_name
+
+	column source_a
+		dataType: string
+		lineageTag: bc45e379-5d81-4ecc-b9ed-3c17864da2c2
+		summarizeBy: none
+		sourceColumn: source_a
+
+	column source_b
+		dataType: string
+		lineageTag: 8922ea01-2868-432c-a7d2-3342bc844e0a
+		summarizeBy: none
+		sourceColumn: source_b
+
+	column rows_checked
+		dataType: int64
+		lineageTag: d2ef836d-cb17-4bff-b29c-b9be53d6bf37
+		summarizeBy: sum
+		sourceColumn: rows_checked
+
+	column rows_mismatched
+		dataType: int64
+		lineageTag: de239323-3a75-4160-a3df-899e643cd9f9
+		summarizeBy: sum
+		sourceColumn: rows_mismatched
+
+	column amount_at_risk_eur
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 08eccebf-e758-4d71-80e4-2734b3bcff1f
+		summarizeBy: sum
+		sourceColumn: amount_at_risk_eur
+
+	column status
+		dataType: string
+		lineageTag: d883cd6d-e7ef-4f6c-95c9-f97da8ba8335
+		summarizeBy: none
+		sourceColumn: status
+
+	column severity
+		dataType: string
+		lineageTag: c7b7822a-e647-47cb-8918-b8c15f571b9f
+		summarizeBy: none
+		sourceColumn: severity
+
+	column detail
+		dataType: string
+		lineageTag: 94e8793f-02ba-405d-8434-420c5f653c5d
+		summarizeBy: none
+		sourceColumn: detail
+
+	column run_id
+		dataType: string
+		lineageTag: 2f1074ad-f130-4242-86e0-7be782162c1f
+		summarizeBy: none
+		sourceColumn: run_id
+
+	column run_ts
+		dataType: dateTime
+		lineageTag: 8b08ad8c-9263-4bce-9c25-9223b2f1309c
+		summarizeBy: none
+		sourceColumn: run_ts
+
+	column leak_type
+		dataType: string
+		lineageTag: 30255f38-1796-4289-b63f-7570fbe97a6f
+		summarizeBy: none
+		sourceColumn: leak_type
+
+	column is_data_defect
+		dataType: boolean
+		lineageTag: 4f195378-ad8c-471c-b183-8b151c928c2f
+		summarizeBy: none
+		sourceColumn: is_data_defect
+
+	partition mart_revenue_assurance = m
+		mode: import
+		source =
+				let
+					Source = DatabricksMultiCloud.Catalogs("dbc-21b8c56c-c07d.cloud.databricks.com", "/sql/1.0/warehouses/551fe0674560cc7c", [Catalog = null, Database = null]),
+					Catalog = Source{[Name = "data_sentinel", Kind = "Database"]}[Data],
+					Schema = Catalog{[Name = "gold", Kind = "Schema"]}[Data],
+					Mart = Schema{[Name = "mart_revenue_assurance", Kind = "Table"]}[Data]
+				in
+					Mart
+
+	annotation DataStatus = "Databricks source configured; authenticate and refresh in Power BI Desktop."
+
