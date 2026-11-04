@@ -1,0 +1,39 @@
+/// Business targets and critical thresholds. Change a value here and every measure, status pill and color follows.
+table Targets
+	lineageTag: 4e2a1c42-b231-415d-bc7d-99a6eebcca2e
+
+	column Metric
+		dataType: string
+		lineageTag: 0331af35-cfae-4e2f-9f57-bbc4a41e32b4
+		summarizeBy: none
+		sourceColumn: [Metric]
+
+	column Target
+		dataType: double
+		formatString: 0.0%
+		lineageTag: f0cfbd74-cc1e-473f-b1d9-e0a39ee9babd
+		summarizeBy: none
+		sourceColumn: [Target]
+
+	/// The level where a status pill turns red (equal to Target when there is no separate critical level)
+	column Critical
+		dataType: double
+		formatString: 0.0%
+		lineageTag: f665594e-0497-41f9-9172-d97524f0c4d0
+		summarizeBy: none
+		sourceColumn: [Critical]
+
+	partition Targets = calculated
+		mode: import
+		source =
+				DATATABLE (
+				    "Metric", STRING, "Target", DOUBLE, "Critical", DOUBLE,
+				    {
+				        { "DQ Pass Rate", 0.98, 0.95 },
+				        { "Drop Rate", 0.02, 0.03 },
+				        { "SLA Compliance", 0.95, 0.85 },
+				        { "Collection Rate", 0.95, 0.85 },
+				        { "Crash Share", 0.02, 0.02 }
+				    }
+				)
+
