@@ -1,4 +1,6 @@
-# dbt_simple - the Gold layer, written for beginners
+# dbt/dbt - the Gold layer, written for beginners
+
+(Airflow mounts this folder as `/opt/airflow/dbt_simple`, so you will see that name in the DAG.)
 
 dbt reads the Silver tables (made by the notebooks) and builds the Gold star schema and the dashboard tables.
 
@@ -28,14 +30,15 @@ Two ideas to remember:
 - Surrogate key = a number made with xxhash64 from the real id, so every dim row has one stable key.
 
 ## Run it (Windows PowerShell)
-    cd dbt_simple
+    cd dbt\dbt
     python -m venv .venv ; .\.venv\Scripts\Activate.ps1
     pip install -r requirements.txt
     mkdir $env:USERPROFILE\.dbt -Force
-    copy profiles.yml.example $env:USERPROFILE\.dbt\profiles.yml     # edit http_path
+    copy profiles.yml $env:USERPROFILE\.dbt\profiles.yml     # check host and http_path
     $env:DATABRICKS_TOKEN = "dapi..."
-    dbt debug        # must end with "All checks passed"
-    dbt build        # models + tests in the right order
+    dbt debug              # must end with "All checks passed"
+    dbt build              # models + tests in the right order
+    dbt source freshness   # warns if a Silver table was not loaded for 2 days (Airflow runs this too)
 
 Needs a Databricks SQL warehouse (http_path is on its Connection details tab).
 Run the Silver notebooks and the reconciliation first, and the incident phase once (so monitoring.incident_ops exists).
