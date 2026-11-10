@@ -21,6 +21,12 @@ from pyspark.sql import Window
 from pyspark.sql import functions as F
 from pyspark.sql.types import (DoubleType, LongType, StringType, StructField, StructType, TimestampType)
 
+try:
+    spark
+except NameError:
+    from pyspark.sql import SparkSession
+    spark = SparkSession.builder.getOrCreate()
+
 CATALOG = "data_sentinel"
 CONTRACT_DIR = f"/Volumes/{CATALOG}/monitoring/contracts"
 
@@ -259,18 +265,26 @@ def load_source(c):
         df = (df.withColumn("_file_name", file_name)
                 .withColumn("_offset", F.col("offset"))
                 .withColumn("_row_id", F.concat_ws("|", F.col("topic"), F.col("partition").cast("string"),
-                                                   F.col("offset").cast("string"))))
+                                                   F.col("offset").cast("string"),
+                                                   F.col("kafka_timestamp_ms").cast("string"))))  # offsets can restart at 0
     elif kind == "cdc":
-        op = F.get_json_object("value", "$.op")
+        # The Debezium message may be wrapped as {"schema":..., "payload":{...}} (schemas enabled) or plain
+        # {"op":..., "after":{...}} (schemas disabled). Both are read. A value stored as a JSON string is unwrapped.
+        df = df.withColumn("value", F.when(F.col("value").startswith('"'), F.get_json_object("value", "$"))
+                                     .otherwise(F.col("value")))
+        def _j(path):
+            return F.coalesce(F.get_json_object("value", "$.payload" + path), F.get_json_object("value", "$" + path))
+        op = _j(".op")
         df = df.filter(F.col("topic") == s["topic"]).filter(op.isin("r", "c", "u"))
         for col in cols:
-            df = df.withColumn(col, F.get_json_object("value", f"$.after.{col}"))
+            df = df.withColumn(col, _j(f".after.{col}"))
         df = (df.withColumn("_op", op)
-                .withColumn("_ts_ms", F.get_json_object("value", "$.ts_ms").cast("long"))
+                .withColumn("_ts_ms", _j(".ts_ms").cast("long"))
                 .withColumn("_offset", F.col("offset"))
                 .withColumn("_file_name", file_name)
                 .withColumn("_row_id", F.concat_ws("|", F.col("topic"), F.col("partition").cast("string"),
-                                                   F.col("offset").cast("string"))))
+                                                   F.col("offset").cast("string"),
+                                                   F.col("kafka_timestamp_ms").cast("string"))))  # offsets can restart at 0
         w = Window.partitionBy(*[F.col(k) for k in s["key"]]).orderBy(F.col("_ts_ms").desc(), F.col("offset").desc())
         df = df.withColumn("_is_latest", F.row_number().over(w) == 1)
     df = _ensure_meta(df)
