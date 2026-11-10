@@ -1,6 +1,6 @@
 """Upload the contract YAML files to the Databricks Volume used by the quality notebooks.
 
-  python tools/upload_contracts.py            (run from the quality_phase folder, needs .env with DATABRICKS_HOST and DATABRICKS_TOKEN)
+  python scripts/upload_contracts.py      (from the repo root, needs .env with DATABRICKS_HOST and DATABRICKS_TOKEN)
 
 Run notebook 10_quality_setup first, so the volume data_sentinel.monitoring.contracts exists.
 """

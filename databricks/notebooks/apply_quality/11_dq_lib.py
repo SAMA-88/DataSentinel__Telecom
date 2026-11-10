@@ -41,6 +41,11 @@ SEVERITIES = {"low", "medium", "high", "critical"}
 FIX_OPS = {"trim", "lower", "upper", "regex_replace"}
 COMPARE_OPS = {"<", "<=", ">", ">=", "=", "!="}
 
+# The 'trim' fix step, written once as a regex so Spark (Java regex) and Python (re) strip exactly the same
+# characters: space, tab, newline, carriage return, form feed, vertical tab and the no-break space (U+00A0)
+# that Excel exports often add. Spark's F.trim() would strip spaces only, Python's str.strip() far more.
+TRIM_PATTERN = r"^[ \t\n\r\f\x0B ]+|[ \t\n\r\f\x0B ]+$"
+
 
 # ======================================================================
 # 1. Contracts (pure Python, no Spark)
@@ -80,19 +85,21 @@ def expand_rules(c, include_unique=True):
 
 
 def apply_fix_steps_py(value, steps):
-    """Python twin of the Spark fix steps. Used by the local validator to test the fixes."""
+    """Python twin of fix_expression (Spark). Used by the local validator and unit tests to test the fixes.
+    13_rule_tests checks on Databricks that both give the same result."""
     if value is None:
         return None
     for s in steps:
         op = s["op"]
         if op == "trim":
-            value = value.strip()
+            value = re.sub(TRIM_PATTERN, "", value)
         elif op == "lower":
             value = value.lower()
         elif op == "upper":
             value = value.upper()
         elif op == "regex_replace":
-            value = re.sub(s["pattern"], re.sub(r"\$(\d)", r"\\\1", s["replacement"]), value)
+            # Spark/Java writes group references as $1, $12; Python as \g<1>, \g<12>
+            value = re.sub(s["pattern"], re.sub(r"\$(\d+)", r"\\g<\1>", s["replacement"]), value)
     return value
 
 
@@ -165,6 +172,14 @@ def validate_contract(c):
                     re.compile(st["pattern"])
                 except Exception as e:
                     errs.append(f"fix on {fx.get('column')}: bad regex ({e})")
+    slo = c.get("slo", {})
+    for k in ("min_pass_rate", "circuit_breaker_min_pass_rate"):
+        v = slo.get(k)
+        if v is not None and (isinstance(v, bool) or not isinstance(v, (int, float)) or not 0 <= v <= 1):
+            errs.append(f"slo.{k} must be a number between 0 and 1 (got {v!r})")
+    mp, cb = slo.get("min_pass_rate"), slo.get("circuit_breaker_min_pass_rate")
+    if isinstance(mp, (int, float)) and isinstance(cb, (int, float)) and cb > mp:
+        errs.append(f"slo.circuit_breaker_min_pass_rate ({cb}) must not be above slo.min_pass_rate ({mp})")
     m = c.get("monitors", {})
     fr = m.get("freshness")
     if fr and fr.get("type") != "stream" and fr.get("frequency") not in ("daily", "monthly"):
@@ -429,7 +444,7 @@ def fix_expression(name, c):
     for s in steps:
         op = s["op"]
         if op == "trim":
-            e = F.trim(e)
+            e = F.regexp_replace(e, TRIM_PATTERN, "")
         elif op == "lower":
             e = F.lower(e)
         elif op == "upper":
