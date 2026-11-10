@@ -5,8 +5,9 @@ Order of the tasks and why:
   bronze_*          load new CDC events (01_bronze) and batch files into Bronze, in parallel
                     (app events are not loaded by this pipeline)
   gate              contract + rules: pass -> validated table, fail -> quarantine.
-                    Circuit breaker: if 50% or more of any table's rows fail, the gate raises after saving its
-                    results, so everything after it stops (the incident is still alerted, Gold is not rebuilt)
+                    Circuit breaker: if any table's pass rate is below its contract's circuit_breaker_min_pass_rate
+                    (max_reject_rate below is only the default for contracts without one), the gate raises after
+                    saving its results, so everything after it stops (the incident is still alerted, Gold is not rebuilt)
   autofix           deterministic repairs on quarantined rows
   revalidate        same rules again on the fixed rows
   monitors          the five observability pillars

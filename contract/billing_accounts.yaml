@@ -28,7 +28,7 @@ fixes:
       - {op: trim}
       - {op: regex_replace, pattern: "[ -]", replacement: ""}
       - {op: regex_replace, pattern: "^0(6[0-9]{8})$", replacement: "+31$1"}
-    examples: [["0612345678", "+31612345678"]]
+    examples: [["0612345678", "+31612345678"], ["\t06-12345678 ", "+31612345678"]]
     unfixable: ["ABC", "0612345", "+31-bad"]
 monitors:
   freshness: {type: stream, max_delay_minutes: 1440}

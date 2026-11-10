@@ -16,7 +16,7 @@ columns:
   - {name: data_mb, type: "decimal(12,2)", required: true}
   - {name: cell_id, type: string, required: false}   # optional: a missing cell_id is only flagged (NET_CELL_PRESENT)
   - {name: call_result, type: string, required: true}
-slo: {min_pass_rate: 0.95, circuit_breaker_min_pass_rate: 0.30}
+slo: {min_pass_rate: 0.95, circuit_breaker_min_pass_rate: 0.50}
 rules:
   - {id: NET_CDR_ID_NOT_NULL, type: not_null, column: cdr_id, dimension: completeness, severity: critical, action: reject}
   - {id: NET_CDR_ID_UNIQUE, type: unique, keys: [cdr_id], order_by: [_file_name], dimension: uniqueness, severity: high, action: reject}

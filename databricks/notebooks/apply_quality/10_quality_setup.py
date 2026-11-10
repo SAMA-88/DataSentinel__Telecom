@@ -1,6 +1,6 @@
 # Databricks notebook source
 # Creates the schemas, the contracts volume and the monitoring tables for the quality phase.
-# Run it once, upload the contracts (tools/upload_contracts.py), then run it again to load the rule catalogue.
+# Run it once, upload the contracts (scripts/upload_contracts.py), then run it again to load the rule catalogue.
 
 # MAGIC %run ./11_dq_lib
 
@@ -35,7 +35,7 @@ print("schemas, volume and monitoring tables are ready")
 # Load the contracts from the volume, validate them, and fill the rule catalogue (dim_dq_rule) and lineage edges.
 if not os.path.isdir(CONTRACT_DIR) or not any(f.endswith(".yaml") for f in os.listdir(CONTRACT_DIR)):
     print(f"No contracts found in {CONTRACT_DIR}.")
-    print("Upload them with:  python tools/upload_contracts.py   then run this notebook again.")
+    print("Upload them with:  python scripts/upload_contracts.py   then run this notebook again.")
 else:
     contracts = load_contracts()
     problems = {n: validate_contract(c) for n, c in contracts.items()}

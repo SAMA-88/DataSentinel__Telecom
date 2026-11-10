@@ -12,32 +12,22 @@
 #   REJECT  -> quarantine.<dataset>  (status REJECTED)
 #   AUTOFIX -> quarantine.<dataset>  (status PENDING_FIX, repaired by 21 and rechecked by 22)
 # Flag-only failures stay in validated with the rule names in _flags.
-# Circuit breaker: a file missing a required column is rejected as a whole, and a dataset whose
-# pass rate falls below circuit_breaker_min_pass_rate does not overwrite its validated table.
-
-# COMMAND ----------
-
-# Databricks notebook source
-# MAGIC %run ./11_dq_lib
-
-# COMMAND ----------
-
-# QUALITY GATE: test every Bronze row against its data contract.
-#   PASS    -> silver.<dataset>_validated
-#   REJECT  -> quarantine.<dataset>  (status REJECTED)
-#   AUTOFIX -> quarantine.<dataset>  (status PENDING_FIX, repaired by 21 and rechecked by 22)
-# Flag-only failures stay in validated with the rule names in _flags.
-# Circuit breaker: a file missing a required column is rejected as a whole, and a dataset whose
-# pass rate falls below circuit_breaker_min_pass_rate does not overwrite its validated table.
-# Pipeline circuit breaker: if max_reject_rate (default 50%) or more of ANY table's rows fail the gate
-# (rejected or sent to quarantine), that table keeps its old validated data, a critical 'circuit_breaker'
-# incident is opened, and after all tables are checked the notebook raises, so the Airflow tasks after the
-# gate (Silver, recon, Gold) do not run. The incident resolves itself when a later run is below the limit.
+#
+# Each contract has two limits in its slo section:
+#   min_pass_rate                  warning: below it a 'pass_rate_slo' incident (high) is opened, the run goes on
+#   circuit_breaker_min_pass_rate  stop:    below it the circuit breaker trips (see below)
+# A contract without circuit_breaker_min_pass_rate uses the widget max_reject_rate (default 0.5 = trip when
+# 50% or more of the rows fail). Rows sent to autofix count as failed: the breaker judges the source data.
+#
+# Circuit breaker, file level: a CSV file missing a required column is rejected as a whole (FILE_SCHEMA_BLOCK).
+# Circuit breaker, table level: the table keeps its old validated data, a critical 'circuit_breaker' incident
+# is opened, and after all tables are checked the notebook raises, so the Airflow tasks after the gate
+# (Silver, recon, Gold) do not run. The incident resolves itself when a later run is back above the limit.
 
 # COMMAND ----------
 
 dbutils.widgets.text("datasets", "all")
-dbutils.widgets.text("max_reject_rate", "0.5")      # 0.5 = trip when 50% or more of a table's rows fail
+dbutils.widgets.text("max_reject_rate", "0.5")      # fallback for contracts without circuit_breaker_min_pass_rate
 dbutils.widgets.text("stop_on_breaker", "true")     # false = record the incident but do not stop the pipeline
 MAX_REJECT = float(dbutils.widgets.get("max_reject_rate"))
 STOP_ON_BREAKER = dbutils.widgets.get("stop_on_breaker").strip().lower() == "true"
@@ -67,12 +57,18 @@ for name, c in contracts.items():
     slo = c.get("slo", {})
     min_rate = slo.get("min_pass_rate", 0.95)
     reject_rate = (total - passed) / total if total else 0.0
-    tripped = total > 0 and reject_rate >= MAX_REJECT
+    breaker = slo.get("circuit_breaker_min_pass_rate")
+    if breaker is not None:                              # the contract sets the limit for this dataset
+        tripped = total > 0 and pass_rate < breaker
+        limit_txt = f"pass rate {pass_rate:.1%} below the contract limit {breaker:.0%}"
+    else:                                                # no limit in the contract: pipeline default
+        tripped = total > 0 and reject_rate >= MAX_REJECT
+        limit_txt = f"{reject_rate:.1%} of rows failed (default limit {MAX_REJECT:.0%})"
 
     # outputs
     if tripped:
-        tripped_tables.append(f"{name} ({reject_rate:.0%} of {total:,} rows failed)")
-        print(f"  CIRCUIT BREAKER: {reject_rate:.1%} of rows failed (limit {MAX_REJECT:.0%}), validated table not updated")
+        tripped_tables.append(f"{name} ({limit_txt}, {total:,} rows)")
+        print(f"  CIRCUIT BREAKER: {limit_txt}, validated table not updated")
     else:
         (build_validated(df.filter(F.col("_dq_status") == "PASS"), c)
             .write.format("delta").mode("overwrite").option("overwriteSchema", "true")
@@ -102,8 +98,8 @@ for name, c in contracts.items():
     checked.add((name, "circuit_breaker"))
     if tripped:
         failing.append(dict(dataset=name, check="circuit_breaker", scope="all", pillar="validity", severity="critical",
-                            description=f"Circuit breaker: {reject_rate:.1%} of {total:,} rows failed the gate "
-                                        f"(limit {MAX_REJECT:.0%}); validated table kept, pipeline stopped",
+                            description=f"Circuit breaker: {limit_txt} ({total:,} rows); "
+                                        f"validated table kept, pipeline stopped",
                             impacted=impacted))
     checked.add((name, "file_schema_block"))
     for fn, missing in blocked.items():
@@ -123,5 +119,5 @@ display(spark.createDataFrame(summary, "dataset string, rows long, passed long, 
 
 # Pipeline circuit breaker: raise after results and incidents are saved, so the run stops here.
 if tripped_tables and STOP_ON_BREAKER:
-    raise Exception(f"CIRCUIT BREAKER OPEN: {MAX_REJECT:.0%} or more of the rows failed in: " + "; ".join(tripped_tables))
+    raise Exception("CIRCUIT BREAKER OPEN in: " + "; ".join(tripped_tables))
 print("circuit breaker: " + ("tripped, but stop_on_breaker=false" if tripped_tables else "closed, all tables below the limit"))

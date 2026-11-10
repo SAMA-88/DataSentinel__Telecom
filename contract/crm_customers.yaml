@@ -45,13 +45,14 @@ fixes:
       - {op: trim}
       - {op: regex_replace, pattern: "[ -]", replacement: ""}
       - {op: regex_replace, pattern: "^0(6[0-9]{8})$", replacement: "+31$1"}
-    examples: [["0612345678", "+31612345678"], ["06 12345678", "+31612345678"], ["06-12345678", "+31612345678"]]
-    unfixable: ["ABC", "0612345", "+31-bad"]
+    examples: [["0612345678", "+31612345678"], ["06 12345678", "+31612345678"], ["06-12345678", "+31612345678"],
+               ["\t0612345678\n", "+31612345678"], [" 06 12345678 ", "+31612345678"]]
+    unfixable: ["ABC", "0612345", "+31-bad", "06\t12345678"]
   - column: email
     steps:
       - {op: trim}
       - {op: lower}
-    examples: [["  LUCAS.4@EXAMPLE.NL ", "lucas.4@example.nl"]]
+    examples: [["  LUCAS.4@EXAMPLE.NL ", "lucas.4@example.nl"], ["\tLUCAS.4@EXAMPLE.NL ", "lucas.4@example.nl"]]
 monitors:
   freshness: {type: stream, max_delay_minutes: 1440}
 lineage:
