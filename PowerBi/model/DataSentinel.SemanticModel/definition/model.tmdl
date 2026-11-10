@@ -34,6 +34,7 @@ ref table LocalDateTable_c243d746-ab21-4187-948c-9237978ab976
 ref table LocalDateTable_69f001bc-270d-4ca2-8f11-6346b0d0beb6
 ref table LocalDateTable_ecca7902-1083-4968-80c2-1f44d4e00dfa
 ref table Attention
+ref table Targets
 
 ref cultureInfo en-US
 

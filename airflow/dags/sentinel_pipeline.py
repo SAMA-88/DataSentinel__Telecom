@@ -15,6 +15,7 @@ Order of the tasks and why:
   recon             cross-system checks (only reads Silver)
   incidents         assign owner/priority, alert, escalate, record resolved (after gate, monitors and recon)
   dbt_build         Gold dims, facts, marts and tests (after incidents, because mart_incidents reads them)
+  dbt_source_freshness  warns when a Silver table has not been loaded for 2 days (never blocks Gold)
 """
 import os
 from datetime import datetime, timedelta
@@ -77,6 +78,16 @@ with DAG(
         bash_command="cd /opt/airflow/dbt_simple && /home/airflow/dbt_venv/bin/dbt build --profiles-dir /opt/airflow/dbt_profiles",
     )
 
+    # dbt build does not check source freshness, so run it on its own. sources.yml only sets warn_after,
+    # so a stale Silver table logs a warning and does not fail. It runs next to dbt_build, never in front
+    # of it, and all_done makes it report even when the pipeline stopped earlier (that is when it matters).
+    dbt_freshness = BashOperator(
+        task_id="dbt_source_freshness",
+        bash_command="cd /opt/airflow/dbt_simple && /home/airflow/dbt_venv/bin/dbt source freshness --profiles-dir /opt/airflow/dbt_profiles",
+        trigger_rule="all_done",
+    )
+
     [bronze_cdc, bronze_files] >> gate >> autofix >> revalidate >> monitors
     monitors >> silver_history >> silver_clean >> silver_xref >> recon >> incidents >> dbt_build
     gate >> dbt_build             # Gold is not rebuilt when the breaker tripped
+    incidents >> dbt_freshness

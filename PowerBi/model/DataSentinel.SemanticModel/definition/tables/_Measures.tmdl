@@ -299,14 +299,14 @@ table _Measures
 		lineageTag: cf9cc545-db8c-4903-8041-d56f6e43434b
 
 	/// UI: report helper
-	measure 'Color Pass Rate' = IF ( [DQ Pass Rate] < 0.95, "#D9363E", "#2F6FDB" )
+	measure 'Color Pass Rate' = IF ( [DQ Pass Rate] < [Critical DQ Pass], "#D9363E", "#2F6FDB" )
 		isHidden
 		lineageTag: 8d0473bc-ded6-4740-bdb4-dd5df7e67bff
 
 	/// UI: report helper
 	measure 'Color Matrix' =
 			VAR v = [DQ Trend Pass Rate]
-			RETURN SWITCH ( TRUE (), ISBLANK ( v ), BLANK (), v < 0.9, "#FBD5D5", v < 0.98, "#FDECC8", "#D7F2E3" )
+			RETURN SWITCH ( TRUE (), ISBLANK ( v ), BLANK (), v < 0.9, "#FBD5D5", v < [Target DQ Pass], "#FDECC8", "#D7F2E3" )
 		isHidden
 		lineageTag: 0708dd5e-e695-47b1-961e-f8860361a23b
 
@@ -465,34 +465,58 @@ table _Measures
 		lineageTag: 72212fca-1f6f-4e2b-b5fa-4a012ec4123e
 
 	/// UI5: BI review
-	measure 'Target DQ Pass' = 0.98
+	measure 'Target DQ Pass' = LOOKUPVALUE ( Targets[Target], Targets[Metric], "DQ Pass Rate" )
 		formatString: 0%
 		isHidden
 		lineageTag: f003614b-3550-403c-ac96-69e70191ac3c
 
 	/// UI5: BI review
-	measure 'Target Drop Rate' = 0.02
+	measure 'Target Drop Rate' = LOOKUPVALUE ( Targets[Target], Targets[Metric], "Drop Rate" )
 		formatString: 0.0%
 		isHidden
 		lineageTag: 5e73097e-b962-478d-bfcf-e85f2d267713
 
 	/// UI5: BI review
-	measure 'Target SLA Compliance' = 0.95
+	measure 'Target SLA Compliance' = LOOKUPVALUE ( Targets[Target], Targets[Metric], "SLA Compliance" )
 		formatString: 0%
 		isHidden
 		lineageTag: 5a0496d4-8962-44ac-b3c3-0c6c96758ae8
 
 	/// UI5: BI review
-	measure 'Target Collection' = 0.95
+	measure 'Target Collection' = LOOKUPVALUE ( Targets[Target], Targets[Metric], "Collection Rate" )
 		formatString: 0%
 		isHidden
 		lineageTag: 6fbf7d87-0961-4f71-aa86-ed7bf9e8d487
 
 	/// UI5: BI review
-	measure 'Limit Crash Share' = 0.02
+	measure 'Limit Crash Share' = LOOKUPVALUE ( Targets[Target], Targets[Metric], "Crash Share" )
 		formatString: 0.0%
 		isHidden
 		lineageTag: dbd37641-7272-4207-881f-4a445f36e484
+
+	/// UI5: BI review
+	measure 'Critical DQ Pass' = LOOKUPVALUE ( Targets[Critical], Targets[Metric], "DQ Pass Rate" )
+		formatString: 0%
+		isHidden
+		lineageTag: bde689ea-ce5f-4526-8b9b-a063f7504a47
+
+	/// UI5: BI review
+	measure 'Critical Drop Rate' = LOOKUPVALUE ( Targets[Critical], Targets[Metric], "Drop Rate" )
+		formatString: 0.0%
+		isHidden
+		lineageTag: e2a26550-18c0-4a41-a9fa-a419bbdadb06
+
+	/// UI5: BI review
+	measure 'Critical SLA Compliance' = LOOKUPVALUE ( Targets[Critical], Targets[Metric], "SLA Compliance" )
+		formatString: 0%
+		isHidden
+		lineageTag: de6f0ba7-d4c5-4062-87ff-5dcb40ea4724
+
+	/// UI5: BI review
+	measure 'Critical Collection' = LOOKUPVALUE ( Targets[Critical], Targets[Metric], "Collection Rate" )
+		formatString: 0%
+		isHidden
+		lineageTag: 6602764f-4d8e-40ed-b6b8-17dda6405d6c
 
 	/// UI5: BI review
 	measure 'SLA Compliance' = DIVIDE ( [Resolved In SLA], CALCULATE ( [Incident Count], mart_incidents[status] = "RESOLVED" ) )
@@ -501,12 +525,12 @@ table _Measures
 		lineageTag: 17c8cd92-208b-4c4b-9beb-961418503faf
 
 	/// UI5: BI review
-	measure 'UI DQ Pill Level' = VAR v = [DQ Pass Rate] RETURN SWITCH ( TRUE (), ISBLANK ( v ), -1, v >= [Target DQ Pass], 0, v >= 0.95, 1, 2 )
+	measure 'UI DQ Pill Level' = VAR v = [DQ Pass Rate] RETURN SWITCH ( TRUE (), ISBLANK ( v ), -1, v >= [Target DQ Pass], 0, v >= [Critical DQ Pass], 1, 2 )
 		isHidden
 		lineageTag: 690944af-c150-4dd2-81dd-2015ca315bc5
 
 	/// UI5: BI review
-	measure 'UI DQ Pill' = SWITCH ( [UI DQ Pill Level], 0, "✓ On target (98%)", 1, "! Below 98% target", 2, "✕ Under 95%, critical", "no data" )
+	measure 'UI DQ Pill' = SWITCH ( [UI DQ Pill Level], 0, "✓ On target (" & FORMAT ( [Target DQ Pass], "0%" ) & ")", 1, "! Below " & FORMAT ( [Target DQ Pass], "0%" ) & " target", 2, "✕ Under " & FORMAT ( [Critical DQ Pass], "0%" ) & ", critical", "no data" )
 		isHidden
 		lineageTag: 39620040-2db1-4993-8560-03b58a100688
 
@@ -541,12 +565,12 @@ table _Measures
 		lineageTag: d4aa198a-bbe2-4477-9f15-a89e407c7d6c
 
 	/// UI5: BI review
-	measure 'UI Drop Pill Level' = VAR v = [Drop Rate] RETURN SWITCH ( TRUE (), ISBLANK ( v ), -1, v <= [Target Drop Rate], 0, v <= 0.03, 1, 2 )
+	measure 'UI Drop Pill Level' = VAR v = [Drop Rate] RETURN SWITCH ( TRUE (), ISBLANK ( v ), -1, v <= [Target Drop Rate], 0, v <= [Critical Drop Rate], 1, 2 )
 		isHidden
 		lineageTag: 2c67cddb-d36b-428e-a02a-0e5b4d7053e3
 
 	/// UI5: BI review
-	measure 'UI Drop Pill' = SWITCH ( [UI Drop Pill Level], 0, "✓ Within 2% limit", 1, "! Above 2% limit", 2, "✕ Above 3%, critical", "no data" )
+	measure 'UI Drop Pill' = SWITCH ( [UI Drop Pill Level], 0, "✓ Within " & FORMAT ( [Target Drop Rate], "0%" ) & " limit", 1, "! Above " & FORMAT ( [Target Drop Rate], "0%" ) & " limit", 2, "✕ Above " & FORMAT ( [Critical Drop Rate], "0%" ) & ", critical", "no data" )
 		isHidden
 		lineageTag: 13fd1462-b80d-4271-b3f7-bf6733973dde
 
@@ -561,12 +585,12 @@ table _Measures
 		lineageTag: 050e5e79-6c18-4331-9b8b-416b718a28ac
 
 	/// UI5: BI review
-	measure 'UI Collection Pill Level' = VAR c = [Collection Rate] RETURN SWITCH ( TRUE (), ISBLANK ( c ), -1, c >= [Target Collection], 0, c >= 0.85, 1, 2 )
+	measure 'UI Collection Pill Level' = VAR c = [Collection Rate] RETURN SWITCH ( TRUE (), ISBLANK ( c ), -1, c >= [Target Collection], 0, c >= [Critical Collection], 1, 2 )
 		isHidden
 		lineageTag: 4d4c1c79-5006-456d-917c-f985b447b956
 
 	/// UI5: BI review
-	measure 'UI Collection Pill' = FORMAT ( [Collection Rate], "0%" ) & " collected, target 95%"
+	measure 'UI Collection Pill' = FORMAT ( [Collection Rate], "0%" ) & " collected, target " & FORMAT ( [Target Collection], "0%" )
 		isHidden
 		lineageTag: 1bb3f641-1386-4431-a61b-1dc08b7dd515
 
@@ -581,12 +605,12 @@ table _Measures
 		lineageTag: 0ebacf2b-c599-4963-bc0a-9e3c2294f726
 
 	/// UI5: BI review
-	measure 'UI Compliance Pill Level' = VAR c = [SLA Compliance] RETURN SWITCH ( TRUE (), ISBLANK ( c ), -1, c >= [Target SLA Compliance], 0, c >= 0.85, 1, 2 )
+	measure 'UI Compliance Pill Level' = VAR c = [SLA Compliance] RETURN SWITCH ( TRUE (), ISBLANK ( c ), -1, c >= [Target SLA Compliance], 0, c >= [Critical SLA Compliance], 1, 2 )
 		isHidden
 		lineageTag: 4f1374da-577c-4aa8-bf3f-d0bda719918f
 
 	/// UI5: BI review
-	measure 'UI Compliance Pill' = IF ( ISBLANK ( [SLA Compliance] ), "none resolved yet", FORMAT ( [SLA Compliance], "0%" ) & " in SLA, target 95%" )
+	measure 'UI Compliance Pill' = IF ( ISBLANK ( [SLA Compliance] ), "none resolved yet", FORMAT ( [SLA Compliance], "0%" ) & " in SLA, target " & FORMAT ( [Target SLA Compliance], "0%" ) )
 		isHidden
 		lineageTag: 0d742e89-c794-455f-b538-83c03372004d
 
