@@ -7,6 +7,8 @@ source:
   kind: csv
   table: data_sentinel.bronze.billing_payments_raw
   file_source: billing_payments
+  file_pattern: 'payments_(\d{6})\.csv$'
+  file_date_format: "%Y%m"
 columns:
   - {name: payment_id, type: bigint, required: true}
   - {name: invoice_id, type: bigint, required: true}
@@ -26,7 +28,8 @@ rules:
   - {id: PAYF_STATUS_DOMAIN, type: domain, column: status, values: [PAID, FAILED, REFUNDED], dimension: domain, severity: medium, action: reject}
   - {id: PAYF_PAID_NOT_FUTURE, type: not_future, column: paid_at, dimension: timeliness, severity: medium, action: reject}
 monitors:
-  freshness: {frequency: monthly, max_delay_days: 10}
+  # one file per month; due 10 days after the month ends, by 06:00 Amsterdam time (late file detector)
+  freshness: {frequency: monthly, max_delay_days: 10, deadline: "06:00", timezone: Europe/Amsterdam, expected_from: 2026-07-01}
   volume: {ratio_to_median: [0.7, 1.3]}
 lineage:
   upstream: [data_sentinel.bronze.billing_payments_raw]

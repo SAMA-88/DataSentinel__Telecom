@@ -12,6 +12,8 @@ fix_expression) are tested on Databricks by the notebook 13_rule_tests.
 """
 import sys
 import types
+import zoneinfo  # noqa: F401  imported here so it stays in sys.modules: patch.dict below drops modules first
+                 # imported inside it, which breaks zoneinfo's C module for the library that imported it
 from functools import lru_cache
 from pathlib import Path
 from unittest import mock

@@ -6,7 +6,7 @@ Setup (PowerShell, Docker Desktop running)
   0. Put the folders airflow_sentinel and dbt_simple SIDE BY SIDE (same parent folder). Docker mounts ..\dbt_simple.
   1. cd airflow_sentinel
   2. copy .env.example .env      and edit it: token, SQL warehouse path, notebook folder
-  3. In Databricks, put ALL notebooks in ONE workspace folder (01_bronze, 02_bronze_app_events, 03_bronze_batch_files, 11_dq_lib, 20, 21, 22, 30,
+  3. In Databricks, put ALL notebooks in ONE workspace folder (01_bronze, 02_bronze_app_events, 03_bronze_batch_files, 11_dq_lib, 20, 21, 22, 30, 33,
      49_silver_lib, 50, 51, 52, 60_recon, 70-73 incident notebooks),
      because they load each other with  %run ./11_dq_lib  and  %run ./49_silver_lib
   4. docker compose up -d --build        (first build takes a few minutes)

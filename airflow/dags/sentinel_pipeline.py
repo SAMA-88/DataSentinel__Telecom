@@ -11,6 +11,8 @@ Order of the tasks and why:
   autofix           deterministic repairs on quarantined rows
   revalidate        same rules again on the fixed rows
   monitors          the five observability pillars
+  late_files        expected vs arrived batch files: a missing or late file opens an incident. It reads the landing
+                    Volume itself, so it runs from the start, even when Bronze or the gate failed
   silver_*          SCD2 history, clean tables, customer_xref
   recon             cross-system checks (only reads Silver)
   incidents         assign owner/priority, alert, escalate, record resolved (after gate, monitors and recon)
@@ -63,6 +65,7 @@ with DAG(
     autofix = notebook("autofix", "21_quarantine_autofix")
     revalidate = notebook("revalidate", "22_revalidate")
     monitors = notebook("monitors", "30_observability_monitors")
+    late_files = notebook("late_files", "33_late_file_detector")
 
     silver_history = notebook("silver_history", "50_silver_history")
     silver_clean = notebook("silver_clean", "51_silver_clean")
@@ -80,3 +83,4 @@ with DAG(
     [bronze_cdc, bronze_files] >> gate >> autofix >> revalidate >> monitors
     monitors >> silver_history >> silver_clean >> silver_xref >> recon >> incidents >> dbt_build
     gate >> dbt_build             # Gold is not rebuilt when the breaker tripped
+    late_files >> incidents       # independent of Bronze: a missing file is reported even when loading failed

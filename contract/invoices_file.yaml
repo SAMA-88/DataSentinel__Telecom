@@ -7,6 +7,8 @@ source:
   kind: csv
   table: data_sentinel.bronze.billing_invoices_raw
   file_source: billing_invoices
+  file_pattern: 'invoices_(\d{6})\.csv$'
+  file_date_format: "%Y%m"
 columns:
   - {name: invoice_id, type: bigint, required: true}
   - {name: account_ref, type: string, required: true}
@@ -34,7 +36,8 @@ rules:
     action: flag
     description: Invoice total must equal plan fee plus overage
 monitors:
-  freshness: {frequency: monthly, max_delay_days: 10}
+  # one file per month; due 10 days after the month ends, by 06:00 Amsterdam time (late file detector)
+  freshness: {frequency: monthly, max_delay_days: 10, deadline: "06:00", timezone: Europe/Amsterdam, expected_from: 2026-07-01}
   volume: {ratio_to_median: [0.8, 1.25]}
   distribution:
     - {name: avg_total_amount, expr: "avg(try_cast(total_amount AS double))", ratio_to_median: [0.7, 1.5]}
