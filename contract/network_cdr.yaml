@@ -7,6 +7,8 @@ source:
   kind: csv
   table: data_sentinel.bronze.network_cdr_raw
   file_source: network
+  file_pattern: 'cdr_(\d{8})\.csv$'
+  file_date_format: "%Y%m%d"
 columns:
   - {name: cdr_id, type: string, required: true}
   - {name: msisdn, type: string, required: true}
@@ -28,7 +30,8 @@ rules:
   - {id: NET_CELL_PRESENT, type: not_null, column: cell_id, dimension: completeness, severity: low, action: flag}
   - {id: NET_RESULT_DOMAIN, type: domain, column: call_result, values: [COMPLETED, DROPPED], dimension: domain, severity: medium, action: reject}
 monitors:
-  freshness: {frequency: daily, max_delay_days: 1}
+  # one file per day; the file for day D is due by 06:00 Amsterdam time on D+1 (late file detector)
+  freshness: {frequency: daily, max_delay_days: 1, deadline: "06:00", timezone: Europe/Amsterdam, expected_from: 2026-09-28}
   volume: {min_rows: 1000, max_rows: 20000, ratio_to_median: [0.5, 2.0]}
   distribution:
     - {name: avg_data_mb, expr: "avg(try_cast(data_mb AS double))", where: "event_type = 'DATA'", ratio_to_median: [0.5, 3.0]}

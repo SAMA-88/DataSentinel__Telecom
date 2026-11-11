@@ -1,6 +1,6 @@
 # Databricks notebook source
 # OBSERVABILITY MONITORS: the five pillars of data observability, driven by the 'monitors' section of each contract.
-#   freshness    did the data arrive on time, and is a file missing?
+#   freshness    are the stream (CDC) events recent? (files: missing and late files are 33_late_file_detector)
 #   volume       is the row count in the normal range?
 #   distribution are the values in the normal range?
 #   schema       did columns appear, disappear or change?
@@ -32,20 +32,6 @@ def record(c, check, rule_id, pillar, scope, n_checked, n_failed, severity, deta
                             impacted=", ".join(impacted_tables(validated_table(c), edges))))
 
 
-def month_range(a, b):
-    out, y, m = [], a.year, a.month
-    while (y, m) <= (b.year, b.month):
-        out.append(date(y, m, 1))
-        m += 1
-        if m > 12:
-            m, y = 1, y + 1
-    return out
-
-
-def month_end(d):
-    return date(d.year + (d.month == 12), d.month % 12 + 1, 1) - timedelta(days=1)
-
-
 # COMMAND ----------
 
 for name, c in contracts.items():
@@ -54,28 +40,11 @@ for name, c in contracts.items():
     files = [r for r in audit_rows if kind == "csv" and r["source"] == src["file_source"]]
 
     # ---------------- FRESHNESS ----------------
+    # Files (csv) are checked by 33_late_file_detector: missing and late files, one incident per file.
+    # Marking the old file checks as checked (with no failure) closes incidents they opened before the move.
     fr = mon.get("freshness")
     if fr and kind == "csv":
-        dates = sorted({r["file_date"] for r in files if r["file_date"]})
-        if not dates:
-            record(c, "freshness_missing_file", "FRESHNESS_MISSING_FILE", "freshness", "all", 0, 1, "high", "no files loaded yet")
-        else:
-            if fr["frequency"] == "daily":
-                expected = [dates[0] + timedelta(days=i) for i in range((dates[-1] - dates[0]).days + 1)]
-                latest_end = dates[-1]
-            else:
-                expected = month_range(dates[0], dates[-1])
-                latest_end = month_end(dates[-1])
-            missing = [d for d in expected if d not in set(dates)]
-            for d in missing:
-                record(c, "freshness_missing_file", "FRESHNESS_MISSING_FILE", "freshness", str(d), len(expected), 1, "high",
-                       f"no {fr['frequency']} file for {d}")
-            if not missing:
-                record(c, "freshness_missing_file", "FRESHNESS_MISSING_FILE", "freshness", "all", len(expected), 0, "high",
-                       f"all {len(expected)} expected files present")
-            lag = (AS_OF - latest_end).days
-            record(c, "freshness_lag", "FRESHNESS_LAG", "freshness", "latest", 1, int(lag > fr["max_delay_days"]), "high",
-                   f"latest file covers {latest_end}, {lag} days before {AS_OF} (SLA {fr['max_delay_days']} days)")
+        checked.update({(c["dataset"], "freshness_missing_file"), (c["dataset"], "freshness_lag")})
     elif fr and fr.get("type") == "stream":
         q = spark.table(src["table"])
         if kind == "cdc":

@@ -7,6 +7,8 @@ source:
   kind: csv
   table: data_sentinel.bronze.partner_usage_raw
   file_source: partner
+  file_pattern: 'partner_usage_(\d{6})\.csv$'
+  file_date_format: "%Y%m"
 columns:
   - {name: partner_record_id, type: string, required: true}
   - {name: msisdn, type: string, required: true}
@@ -23,7 +25,8 @@ rules:
   - {id: PRT_AMOUNT_NON_NEGATIVE, type: range, column: amount, min: 0, dimension: validity, severity: high, action: flag}
   - {id: PRT_CURRENCY_DOMAIN, type: domain, column: currency, values: [EUR], dimension: domain, severity: medium, action: reject}
 monitors:
-  freshness: {frequency: monthly, max_delay_days: 10}
+  # one file per month; due 10 days after the month ends, by 06:00 Amsterdam time (late file detector)
+  freshness: {frequency: monthly, max_delay_days: 10, deadline: "06:00", timezone: Europe/Amsterdam, expected_from: 2026-07-01}
   volume: {ratio_to_median: [0.7, 1.3]}
   distribution:
     - {name: avg_amount, expr: "avg(try_cast(amount AS double))", ratio_to_median: [0.5, 2.0]}
