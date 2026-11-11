@@ -55,10 +55,15 @@ first_seen = {}
 for r in spark.table(T_ARRIVALS).filter("arrived_at IS NOT NULL").select("dataset", "file_name", "arrived_at").collect():
     first_seen.setdefault(r["dataset"], {})[r["file_name"]] = utc(r["arrived_at"])
 
-out_rows, results, failing, checked = [], [], [], set()
+out_rows, results, failing, checked, bad_contracts = [], [], [], set(), {}
 for name, c in contracts.items():
     fr, src = c.get("monitors", {}).get("freshness"), c["source"]
     if src["kind"] != "csv" or not fr or fr.get("type") == "stream":
+        continue
+    problems = validate_contract(c)
+    if problems:                                         # e.g. an old contract without the file schedule
+        bad_contracts[name] = problems
+        print(f"[{name}] SKIPPED, contract problems: {'; '.join(problems)}")
         continue
     folder = f"{BATCH_DIR}/{src['file_source']}"
     try:
@@ -110,10 +115,18 @@ for name, c in contracts.items():
 
 # Rewrite the arrivals table: every expected file with its current status. arrived_at never moves later,
 # because the first time a file was seen is read back above and wins over the folder listing.
-spark.createDataFrame(out_rows, ARRIVAL_SCHEMA).write.mode("overwrite").saveAsTable(T_ARRIVALS)
+if out_rows:   # a dataset that was skipped keeps its old rows: only the datasets checked now are replaced
+    done = list({r[0] for r in out_rows})
+    (spark.createDataFrame(out_rows, ARRIVAL_SCHEMA).write.mode("overwrite")
+        .option("replaceWhere", "dataset IN (" + ", ".join(f"'{d}'" for d in done) + ")").saveAsTable(T_ARRIVALS))
 save_results(results)
 opened, resolved = sync_incidents(run_id, failing, checked)
 print(f"\nrun {run_id}: incidents opened {opened}, resolved {resolved}")
 display(spark.table(T_ARRIVALS)
         .withColumn("_order", F.when(F.col("status") == "MISSING", 0).when(F.col("status") == "LATE", 1).otherwise(2))
         .orderBy("_order", "dataset", "period_start").drop("_order"))
+
+# Fail the task when a contract could not be checked, so a missing schedule is never silent.
+if bad_contracts:
+    raise Exception("Late file detector could not check: " + "; ".join(f"{n} ({p[0]})" for n, p in bad_contracts.items())
+                    + ". Upload the current contracts:  python scripts/upload_contracts.py")

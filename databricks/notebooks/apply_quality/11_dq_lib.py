@@ -353,8 +353,13 @@ def quarantine_table(c):
     return f"{CATALOG}.quarantine.{c['dataset']}"
 
 
+def utcnow():
+    """Current UTC time without tzinfo, the form the monitoring tables store (datetime.utcnow is deprecated)."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
 def new_run_id():
-    return datetime.utcnow().strftime("%Y%m%d%H%M%S") + "-" + uuid.uuid4().hex[:6]
+    return utcnow().strftime("%Y%m%d%H%M%S") + "-" + uuid.uuid4().hex[:6]
 
 
 # ======================================================================
@@ -620,7 +625,7 @@ INCIDENT_SCHEMA = StructType([
 
 def result_row(run_id, dataset, check, rule_id, dimension, scope, checked, failed, status, severity, detail, version):
     rate = 1.0 if not checked else max(0.0, 1.0 - float(failed) / float(checked))
-    return (run_id, datetime.utcnow(), dataset, check, rule_id, dimension, scope, int(checked), int(failed),
+    return (run_id, utcnow(), dataset, check, rule_id, dimension, scope, int(checked), int(failed),
             float(rate), status, severity, detail, version)
 
 
@@ -645,7 +650,7 @@ def sync_incidents(run_id, failing, checked):
         if k in open_keys or k in seen:
             continue
         seen.add(k)
-        new_rows.append((uuid.uuid4().hex[:12], k, datetime.utcnow(), None, "OPEN", d["dataset"], d["check"],
+        new_rows.append((uuid.uuid4().hex[:12], k, utcnow(), None, "OPEN", d["dataset"], d["check"],
                          d["pillar"], d["severity"], d["scope"], d["description"], d.get("impacted", ""),
                          run_id, None))
     if new_rows:
