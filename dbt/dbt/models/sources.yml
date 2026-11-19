@@ -4,9 +4,10 @@ sources:
   - name: silver
     description: Rows that passed the quality gate, with SCD2 history, hashed PII and customer_xref (built by the Silver notebooks).
     schema: silver
-    loaded_at_field: _loaded_at
-    freshness:
-      warn_after: {count: 2, period: day}
+    config:
+      loaded_at_field: _loaded_at
+      freshness:
+        warn_after: {count: 2, period: day}
     tables:
       - name: customer_history
       - name: plan_history

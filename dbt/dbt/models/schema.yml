@@ -23,11 +23,12 @@ models:
       - name: plan_key
         data_tests:
           - not_null
-          - relationships: {to: ref('dim_plan'), field: plan_key}
+          - relationships: {arguments: {to: ref('dim_plan'), field: plan_key}}
       - name: status
         data_tests:
           - accepted_values:
-              values: [ACTIVE, SUSPENDED, CHURNED, UNKNOWN]
+              arguments:
+                values: [ACTIVE, SUSPENDED, CHURNED, UNKNOWN]
 
   - name: fact_usage
     columns:
@@ -36,33 +37,33 @@ models:
       - name: customer_key
         data_tests:
           - not_null
-          - relationships: {to: ref('dim_customer'), field: customer_key}
+          - relationships: {arguments: {to: ref('dim_customer'), field: customer_key}}
       - name: usage_date_key
         data_tests:
-          - relationships: {to: ref('dim_date'), field: date_key}
+          - relationships: {arguments: {to: ref('dim_date'), field: date_key}}
       - name: event_type
         data_tests:
-          - accepted_values: {values: [VOICE, SMS, DATA]}
+          - accepted_values: {arguments: {values: [VOICE, SMS, DATA]}}
 
   - name: fact_invoice
     columns:
       - name: customer_key
         data_tests:
           - not_null
-          - relationships: {to: ref('dim_customer'), field: customer_key}
+          - relationships: {arguments: {to: ref('dim_customer'), field: customer_key}}
       - name: source
         data_tests:
-          - accepted_values: {values: [billing_db, billing_file]}
+          - accepted_values: {arguments: {values: [billing_db, billing_file]}}
 
   - name: fact_payment
     columns:
       - name: customer_key
         data_tests:
           - not_null
-          - relationships: {to: ref('dim_customer'), field: customer_key}
+          - relationships: {arguments: {to: ref('dim_customer'), field: customer_key}}
       - name: status
         data_tests:
-          - accepted_values: {values: [PAID, FAILED, REFUNDED]}
+          - accepted_values: {arguments: {values: [PAID, FAILED, REFUNDED]}}
 
   - name: fact_app_events
     columns:
@@ -71,10 +72,10 @@ models:
       - name: customer_key
         data_tests:
           - not_null
-          - relationships: {to: ref('dim_customer'), field: customer_key}
+          - relationships: {arguments: {to: ref('dim_customer'), field: customer_key}}
       - name: event_date_key
         data_tests:
-          - relationships: {to: ref('dim_date'), field: date_key}
+          - relationships: {arguments: {to: ref('dim_date'), field: date_key}}
 
   - name: fact_partner_usage
     columns:
@@ -83,7 +84,7 @@ models:
       - name: customer_key
         data_tests:
           - not_null
-          - relationships: {to: ref('dim_customer'), field: customer_key}
+          - relationships: {arguments: {to: ref('dim_customer'), field: customer_key}}
 
   - name: mart_customer_360
     columns:
